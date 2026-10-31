@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>বার্ষিক সর্বভারতীয় যুব প্রশিক্ষণ শিবির - অখিল ভারত বিবেকানন্দ যুব মহামণ্ডল</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-blue: #0b1a62;
+      --navy-dark: #071033;
+      --saffron-orange: #f26522;
+      --saffron-dark: #c8490a;
+      --bg-gradient: linear-gradient(135deg, #0d1b4d 0%, #060d26 100%);
+      --card-bg: #ffffff;
+      --text-main: #1a202c;
+      --text-muted: #4a5568;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans Bengali', 'Open Sans', sans-serif;
+      background: #f0f4f8;
+      color: var(--text-main);
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      background-color: var(--navy-dark);
+      padding: 14px 30px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .top-nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.6px;
+      transition: color 0.2s ease;
+    }
+
+    .top-nav a:hover {
+      color: var(--saffron-orange);
+    }
+
+    .nav-badge {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffd299;
+      background: rgba(242, 101, 34, 0.2);
+      border: 1px solid var(--saffron-orange);
+      padding: 4px 12px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* Hero Banner with Powerful Background */
+    .hero-banner {
+      background: var(--bg-gradient);
+      color: #ffffff;
+      padding: 60px 20px 70px 20px;
+      text-align: center;
+      position: relative;
+      border-bottom: 4px solid var(--saffron-orange);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-banner::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, rgba(242, 101, 34, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .org-tagline {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--saffron-orange);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-dates {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 8px 22px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    /* Main Container */
+    .content-container {
+      max-width: 900px;
+      margin: -35px auto 60px auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Metric / Stat Strip */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 18px 20px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+      border-top: 3px solid var(--primary-blue);
+    }
+
+    .stat-number {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--saffron-orange);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Reading Card */
+    .main-doc-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+
+    .section-block {
+      margin-bottom: 34px;
+    }
+
+    .section-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-block h2 {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 14px;
+      position: relative;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #edf2f7;
+    }
+
+    .section-block h2::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 48px;
+      height: 2px;
+      background-color: var(--saffron-orange);
+    }
+
+    .section-block p {
+      font-size: 16px;
+      color: #2d3748;
+      text-align: justify;
+      margin-bottom: 14px;
+    }
+
+    .quote-box {
+      background: #fff8f3;
+      border-left: 4px solid var(--saffron-orange);
+      padding: 16px 20px;
+      border-radius: 4px;
+      font-size: 15.5px;
+      font-weight: 600;
+      color: #4a2810;
+      margin: 18px 0;
+    }
+
+    /* Swami Vivekananda Powerful Quote Card */
+    .swami-quote-card {
+      position: relative;
+      background: linear-gradient(145deg, #091448 0%, #10216b 60%, #182b82 100%);
+      border: 1px solid rgba(242, 101, 34, 0.4);
+      border-left: 6px solid var(--saffron-orange);
+      border-radius: 12px;
+      padding: 38px 32px 30px 32px;
+      margin: 40px 0 25px 0;
+      box-shadow: 0 12px 30px rgba(9, 20, 72, 0.25);
+      overflow: hidden;
+      color: #ffffff;
+    }
+
+    /* Watermark Quote Mark */
+    .swami-quote-card::before {
+      content: "\201C";
+      position: absolute;
+      top: -25px;
+      left: 18px;
+      font-size: 130px;
+      font-family: Georgia, serif;
+      color: rgba(255, 255, 255, 0.08);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .swami-quote-badge {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--saffron-orange);
+      background: rgba(242, 101, 34, 0.18);
+      border: 1px solid rgba(242, 101, 34, 0.5);
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+    }
+
+    .swami-quote-text {
+      color: #f8fafc;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.85;
+      text-align: justify;
+      position: relative;
+      z-index: 1;
+      letter-spacing: 0.3px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .swami-quote-author {
+      margin-top: 22px;
+      text-align: right;
+      position: relative;
+      z-index: 1;
+    }
+
+    .swami-quote-author span {
+      display: inline-block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffbc85;
+      letter-spacing: 0.5px;
+      position: relative;
+      padding-bottom: 5px;
+    }
+
+    .swami-quote-author span::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 45px;
+      height: 2px;
+      background-color: var(--saffron-orange);
+      border-radius: 2px;
+    }
+
+    /* Bottom Back Button */
+    .back-action-wrap {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .back-big-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--navy-dark);
+      color: #ffffff;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 14px 32px;
+      border-radius: 6px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(7, 16, 51, 0.25);
+    }
+
+    .back-big-btn:hover {
+      background: var(--saffron-orange);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(242, 101, 34, 0.35);
+    }
+
+    @media (max-width: 600px) {
+      .hero-title {
+        font-size: 24px;
+      }
+      .main-doc-card {
+        padding: 24px 18px;
+      }
+      .section-block p {
+        font-size: 15px;
+        text-align: left;
+      }
+      .swami-quote-card {
+        padding: 28px 20px 24px 20px;
+      }
+      .swami-quote-text {
+        font-size: 16px;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <a href="index.html">&#8592; BACK TO EVENT DETAILS</a>
+    <span class="nav-badge">Official Bulletin</span>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <span class="org-tagline">Akhil Bharat Vivekananda Yuva Mahamandal</span>
+    <h1 class="hero-title">বার্ষিক সর্বভারতীয় যুব প্রশিক্ষণ শিবির</h1>
+    <div class="hero-dates">
+      ২৫ ডিসেম্বর বিকেলে আরম্ভ — ৩০ ডিসেম্বর রাত্রে সমাপ্ত
+    </div>
+  </section>
+
+  <!-- Content Container -->
+  <main class="content-container">
+
+    <!-- High-Impact Stat Strip -->
+    <div class="stat-strip">
+      <div class="stat-card">
+        <span class="stat-number">৬ দিন</span>
+        <span class="stat-label">সম্পূর্ণ আবাসিক কর্মসূচি</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">১৬ – ২৫</span>
+        <span class="stat-label">অংশগ্রহণকারীদের বয়সসীমা</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">১০০ &rarr; ২,৪০০+</span>
+        <span class="stat-label">১৯৬৭ থেকে বৃদ্ধিপ্রাপ্ত অংশগ্রহণকারী</span>
+      </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <article class="main-doc-card">
+
+      <div class="section-block">
+        <h2>শিবিরের মূল পরিচয় ও কর্মসূচি</h2>
+        <p>
+          মহামণ্ডল কর্তৃক আয়োজিত বার্ষিক সর্বভারতীয় যুব প্রশিক্ষণ শিবির হল মহামণ্ডলের সবচেয়ে গুরুত্বপূর্ণ ও বৃহত্তম প্রশিক্ষণ কর্মসূচি। এই শিবিরটি সাধারণত ছয় দিনব্যাপী হয়। প্রতি বছর নির্দিষ্ট তারিখে ২৫ ডিসেম্বর বিকেলে শিবির শুরু হয় এবং ৩০ ডিসেম্বর রাত্রে শেষ হয়।
+        </p>
+        <p>
+          এটি একটি জাতীয় স্তরের যুব প্রশিক্ষণ কর্মসূচি, যেখানে ভারতের বিভিন্ন রাজ্য থেকে বহু মানুষ অংশগ্রহণ করেন। এই শিবিরটি শুধুমাত্র পুরুষদের জন্য, তবে প্রতিদিন বিকেল ৪টার পর এটি সকলের জন্য উন্মুক্ত থাকে।
+        </p>
+      </div>
+
+      <div class="section-block">
+        <h2>শিক্ষা, আদর্শ ও বাস্তব অনুশীলন</h2>
+        <p>
+          এই শিবিরে চরিত্র গঠনের বিভিন্ন বিষয়ের উপর একাধিক বক্তৃতার আয়োজন করা হয়। যেমন—মনের একাগ্রতা, জীবন গঠন, নেতৃত্ব প্রভৃতি। এই বক্তৃতাগুলি বাংলা, ইংরেজি, হিন্দি ইত্যাদি বিভিন্ন ভাষায় প্রদান করা হয়।
+        </p>
+        <div class="quote-box">
+          শিবিরে অংশগ্রহণকারীরা কেবল বক্তৃতা শোনেন না, বরং শিবিরে যে আদর্শ ও শিক্ষাগুলি দেওয়া হয়, সেগুলি বাস্তব জীবনে অনুশীলনও করেন।
+        </div>
+        <p>
+          এ ছাড়াও বিভিন্ন সাংস্কৃতিক অনুষ্ঠানের আয়োজন করা হয়, যার মধ্যে কয়েকটি শিবিরে অংশগ্রহণকারীদের দ্বারাই পরিবেশিত হয়। স্বামী বিবেকানন্দের মানুষ গড়ার ও চরিত্র গঠনের ভাবধারাগুলিকে বুঝতে এবং বাস্তবে অনুশীলন করতে এই শিবিরগুলি বিশেষভাবে সহায়ক।
+        </p>
+      </div>
+
+      <div class="section-block">
+        <h2>সেবা মনোভাব ও শিবিরের চেতনা</h2>
+        <p>
+          শিবিরে অংশগ্রহণকারীদের অধিকাংশের বয়স ১৬ থেকে ২৫ বছরের মধ্যে। তাঁরা বিভিন্ন স্কুল, কলেজ ও বিশ্ববিদ্যালয়ের ছাত্র। বহু শিক্ষক এই কর্মসূচিতে অংশগ্রহণ করার পাশাপাশি তাঁদের ছাত্রদেরও শিবিরে যোগ দিতে উৎসাহিত করেন।
+        </p>
+        <p>
+          এমনকি উচ্চশিক্ষিত শিক্ষক, অধ্যাপক এবং অন্যান্য পেশার সঙ্গে যুক্ত ব্যক্তিরাও শৌচাগার পরিষ্কার করা, প্রহরীর দায়িত্ব পালন করা ইত্যাদি কাজ করতে দ্বিধা বোধ করেন না। আর এটাই এই শিবিরের প্রকৃত আদর্শ ও চেতনা।
+        </p>
+      </div>
+
+      <div class="section-block">
+        <h2>ঐতিহাসিক অগ্রগতি</h2>
+        <p>
+          ১৯৬৭ সালে প্রথম বার্ষিক শিবির যখন আয়োজিত হয়েছিল, তখন সেখানে মাত্র ১০০ জন শিবিরে অংশগ্রহণকারী ছিলেন। কিন্তু ২০১৬ সালে অনুষ্ঠিত ৫০তম বার্ষিক সর্বভারতীয় যুব প্রশিক্ষণ শিবিরে অংশগ্রহণকারীর সংখ্যা প্রায় ২,৪০০-তে পৌঁছেছিল। প্রতি বছরই আমরা লক্ষ্য করি যে, এই শিবিরের প্রতি মানুষের আগ্রহ ক্রমশ বৃদ্ধি পাচ্ছে।
+        </p>
+      </div>
+
+      <!-- Swami Vivekananda Powerful Quote Section -->
+      <div class="swami-quote-card">
+        <span class="swami-quote-badge">যুবশক্তির প্রতি আহ্বান</span>
+        <p class="swami-quote-text">
+          "হে বীরহৃদয় যুবকগণ, তোমরা বিশ্বাস কর যে, তোমরা বড় বড় কাজ করবার জন্য জন্মেছ। ওঠ, জাগো, আর ঘুমিও না; সকল অভাব, সকল দুঃখ ঘুচাবার শক্তি তোমাদের ভিতরেই আছে। এ কথা বিশ্বাস করো, তা হলেই ঐ শক্তি জেগে উঠবে।"
+        </p>
+        <div class="swami-quote-author">
+          <span>— স্বামী বিবেকানন্দ</span>
+        </div>
+      </div>
+
+      <!-- Back Action Button -->
+      <div class="back-action-wrap">
+        <a href="index.html" class="back-big-btn">&#8592; ফিরে যান (Training Camp)</a>
+      </div>
+
+    </article>
+  </main>
+
+</body>
+</html>

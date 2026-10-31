@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upcoming Events - Annual All India Youth Training Camp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-orange: #f26522;
+      --navy-blue: #0b1a62;
+      --text-dark: #1f2937;
+      --text-muted: #555555;
+      --border-gray: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f3f4f6;
+      color: var(--text-dark);
+      width: 100%;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: block;
+    }
+
+    .page-container {
+      width: 100%;
+      min-height: 100vh;
+      background-color: #ffffff;
+      padding-bottom: 50px;
+    }
+
+    /* Top Navigation bar */
+    .top-nav {
+      background-color: #091448;
+      padding: 14px 30px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .top-nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s;
+    }
+
+    .top-nav a:hover {
+      opacity: 0.85;
+    }
+
+    .content-wrapper {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 30px 24px;
+    }
+
+    /* The Voice Quote Card */
+    .voice-card {
+      background: #ffffff;
+      border: 1px solid var(--border-gray);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 32px;
+    }
+
+    .voice-header {
+      background-color: var(--primary-orange);
+      color: #ffffff;
+      padding: 10px 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .voice-body {
+      padding: 22px 20px;
+      text-align: center;
+    }
+
+    .voice-body blockquote {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: #111111;
+      line-height: 1.6;
+    }
+
+    /* Section Header */
+    .section-header {
+      text-align: center;
+      margin: 28px 0 24px 0;
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary-orange);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .decorative-line {
+      width: 85px;
+      height: 2.5px;
+      background-color: var(--primary-orange);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .decorative-line::after {
+      content: "";
+      position: absolute;
+      width: 42px;
+      height: 2px;
+      background-color: var(--primary-orange);
+      top: 5px;
+      left: 21px;
+    }
+
+    .intro-text {
+      text-align: center;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #333333;
+      margin-bottom: 18px;
+      padding: 0 10px;
+    }
+
+    /* Common Card Styling */
+    .events-outer-card {
+      margin-top: 40px;
+      position: relative;
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      padding: 32px 26px 26px 26px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: -16px;
+      left: 24px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-gray);
+      color: var(--primary-orange);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      padding: 6px 16px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .event-item-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: #111111;
+      margin-bottom: 14px;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .event-meta-label {
+      font-size: 12px;
+      color: #666666;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
+    }
+
+    .event-date-highlight {
+      color: var(--primary-orange);
+      font-size: 14.5px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* Professional More Details Button */
+    .btn-more-details {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--primary-orange) 0%, #d84e0e 100%);
+      color: #ffffff;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 10px 22px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(242, 101, 34, 0.28);
+      transition: all 0.25s ease;
+    }
+
+    .btn-more-details:hover {
+      background: linear-gradient(135deg, #d84e0e 0%, var(--navy-blue) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(11, 26, 98, 0.25);
+    }
+
+    /* Contact Details Block */
+    .contact-section {
+      text-align: left;
+    }
+
+    .contact-heading {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--primary-orange);
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .org-header-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .central-logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border-gray);
+      flex-shrink: 0;
+    }
+
+    .central-office-name, .local-office-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--navy-blue);
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .sub-contact-heading {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #444444;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .contact-detail {
+      font-size: 13.5px;
+      color: #333333;
+      line-height: 1.6;
+    }
+
+    .contact-detail a {
+      color: var(--navy-blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .contact-detail a:hover {
+      text-decoration: underline;
+      color: var(--primary-orange);
+    }
+
+    .section-separator {
+      border: 0;
+      border-top: 1px dashed var(--border-gray);
+      margin: 22px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-container">
+    <!-- Top Nav Back Button -->
+    <div class="top-nav">
+      <a href="index.html">&#8592; BACK TO HOME</a>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- The Voice Quote Card -->
+      <div class="voice-card">
+        <div class="voice-header">
+          THE VOICE
+        </div>
+        <div class="voice-body">
+          <blockquote>
+            "The old religion said that he was an atheist who did not believe in God. The new religion says that he is an atheist who does not believe in himself."
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- Upcoming Events Header -->
+      <div class="section-header">
+        <h2 class="section-title">UPCOMING EVENTS</h2>
+        <div class="decorative-line"></div>
+      </div>
+
+      <!-- Intro Paragraphs -->
+      <p class="intro-text">
+        The Mahamandal and its units organize several programmes throughout the year. The main focus of these programmes is the man-making, character-building ideas of Swami Vivekananda, which includes value education, national integration, and religious harmony.
+      </p>
+
+      <p class="intro-text">
+        A series of youth training camps at various levels are being organized in different parts of the country to achieve this objective and make an impact on young minds.
+      </p>
+
+      <!-- 1. SPECIAL EVENTS CARD (Camp Details Only) -->
+      <div class="events-outer-card">
+        <div class="card-badge">SPECIAL EVENTS</div>
+
+        <h3 class="event-item-title">Annual All India Youth Training Camp</h3>
+
+        <div class="event-meta-label">Date & Time</div>
+        <div class="event-date-highlight">
+          25th December 2026, Friday - 30th December 2026, Wednesday
+        </div>
+
+        <!-- Professional More Details Button redirecting to doc.html -->
+        <a href="doc.html" class="btn-more-details">
+          MORE DETAILS <span>&rarr;</span>
+        </a>
+      </div>
+
+      <!-- 2. CONTACT INFORMATION CARD (Separated Box) -->
+      <div class="events-outer-card" id="contact" style="margin-top: 36px;">
+        <div class="card-badge">CONTACT DIRECTORY</div>
+
+        <!-- Central Office Section -->
+        <div class="contact-section">
+          <div class="contact-heading">CENTRAL OFFICE</div>
+
+          <div class="org-header-group">
+            <img src="vvk.jpeg" alt="Central Organization Logo" class="central-logo-img" />
+            <div class="central-office-name">AKHIL BHARAT VIVEKANANDA YUVA MAHAMANDAL</div>
+          </div>
+
+          <p class="contact-detail">
+            Central Organization, 6/1A, Justice Manmatha Mukherjee Row, Kolkata - 700009, West Bengal
+          </p>
+          <p class="contact-detail" style="margin-top: 5px;">
+            <strong>Phone:</strong> <a href="tel:+913323506898">+91 33 2350 6898</a>
+          </p>
+          <p class="contact-detail">
+            <strong>Email:</strong> <a href="mailto:abvymweb@gmail.com">abvymweb@gmail.com</a>
+          </p>
+        </div>
+
+        <hr class="section-separator" />
+
+        <!-- Local Office Section -->
+        <div class="contact-section">
+          <div class="contact-heading">LOCAL OFFICE</div>
+          <div class="local-office-name">KALIYAGANJ VIVEKANANDA YUVA MAHAMANDAL</div>
+          <p class="contact-detail">
+            College Para, Kaliyaganj, Uttar Dinajpur – 733129, West Bengal, India
+          </p>
+
+          <div class="sub-contact-heading">CONTACT NUMBERS</div>
+          <p class="contact-detail">
+            <a href="tel:+918918209417">+91 8918209417</a><br>
+            <a href="tel:+919593590894">+91 9593590894</a><br>
+            <a href="tel:+919635041841">+91 9635041841</a>
+          </p>
+
+          <p class="contact-detail" style="margin-top: 8px;">
+            <strong>Email:</strong> <a href="mailto:kaliyaganjvym@gmail.com">kaliyaganjvym@gmail.com</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

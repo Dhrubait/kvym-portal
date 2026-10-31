@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Kaliyaganj Vivekananda Yuva Mahamandal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase Compat Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #0b1a62;
+      --navy-dark: #071242;
+      --saffron-orange: #f26522;
+      --card-border: #e2e8f0;
+      --bg-slate: #f8fafc;
+      --danger-red: #dc2626;
+      --success-green: #16a34a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background-color: var(--bg-slate); color: #1e293b; min-height: 100vh; }
+
+    /* Login Screen */
+    .login-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--primary-blue) 100%);
+    }
+
+    .login-card {
+      background: #ffffff;
+      max-width: 420px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 36px 30px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.3);
+      border-top: 5px solid var(--saffron-orange);
+      text-align: center;
+    }
+
+    .login-card h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .login-card p {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 13.5px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-blue);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--saffron-orange);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-login:hover { background: #d85213; }
+    .error-msg { color: #dc2626; font-size: 12px; font-weight: 600; margin-top: 10px; display: none; }
+
+    /* Dashboard Layout */
+    .dashboard-wrapper { display: none; }
+    .dash-nav {
+      background: var(--navy-dark);
+      color: #ffffff;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--saffron-orange);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .dash-nav h1 { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; }
+    .dash-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    
+    .btn-action {
+      background: var(--saffron-orange);
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.4px;
+    }
+
+    .btn-action:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-refresh { background: #0284c7; }
+    .btn-clear-all { background: #b91c1c; }
+    .btn-logout { background: #475569; }
+
+    .dash-container { max-width: 1440px; margin: 30px auto; padding: 0 24px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 24px; }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border-left: 5px solid var(--primary-blue);
+      transition: transform 0.2s ease;
+    }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-card h4 { font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .count { font-size: 30px; font-weight: 800; color: var(--primary-blue); margin-top: 4px; font-family: 'Montserrat', sans-serif; }
+
+    /* Registration Switches */
+    .controls-card {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .controls-heading {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .control-box {
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .control-box.halfday-box { border: 1.5px solid #bbf7d0; background: #f0fdf4; }
+    .control-box.oneday-box { border: 1.5px solid #fed7aa; background: #fffaf0; }
+    .control-box.zonal-box { border: 1.5px solid #fecaca; background: #fff5f5; }
+    .control-box.annual-box { border: 1.5px solid #c7d2fe; background: #f5f7ff; }
+
+    .control-title { font-size: 13.5px; font-weight: 800; display: block; font-family: 'Montserrat', sans-serif; }
+    .control-status-sub { color: #64748b; font-size: 11.5px; font-weight: 600; display: block; margin-top: 2px; }
+
+    .btn-toggle-switch {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 11px;
+      cursor: pointer;
+      border: none;
+      text-transform: uppercase;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .filter-bar {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .search-box { flex: 1; min-width: 280px; }
+    .filter-select { padding: 10px 14px; font-size: 13px; border: 1.5px solid #cbd5e1; border-radius: 6px; outline: none; }
+
+    /* Table Styles */
+    .table-container {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      overflow-x: auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 1200px; }
+    th {
+      background: #f1f5f9;
+      padding: 13px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      color: #334155;
+      text-transform: uppercase;
+      font-size: 11px;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+    td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    tr:hover { background-color: #fafbfc; }
+
+    .tag-camp {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-family: 'Montserrat', sans-serif;
+      white-space: nowrap;
+    }
+
+    .tag-halfday { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .tag-oneday { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .tag-zonal { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .tag-annual { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+
+    /* Photo & Document Thumbnails */
+    .doc-preview-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .thumb-img {
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1.5px solid #cbd5e1;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .thumb-img:hover {
+      transform: scale(1.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      border-color: var(--saffron-orange);
+    }
+
+    .btn-file-view {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .btn-pdf-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      background: #e0e7ff;
+      color: #3730a3;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid #c7d2fe;
+    }
+
+    .btn-pdf-link:hover {
+      background: #c7d2fe;
+    }
+
+    .badge-not-required {
+      color: #94a3b8;
+      font-size: 11px;
+      font-style: italic;
+    }
+
+    /* Delete Button */
+    .btn-delete-row {
+      background: #fee2e2;
+      color: var(--danger-red);
+      border: 1px solid #fca5a5;
+      padding: 6px 11px;
+      border-radius: 5px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-delete-row:hover {
+      background: var(--danger-red);
+      color: #ffffff;
+    }
+
+    /* Lightbox Modal */
+    .image-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(9, 20, 72, 0.85);
+      backdrop-filter: blur(5px);
+      z-index: 999999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .image-modal-overlay.active { display: flex; }
+    .image-modal-box {
+      max-width: 600px;
+      width: 100%;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .image-modal-box img {
+      max-width: 100%;
+      max-height: 70vh;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    .modal-close-icon {
+      position: absolute;
+      top: 10px; right: 14px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #64748b;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div class="login-wrapper" id="loginScreen">
+    <div class="login-card">
+      <h2>Mahamandal Admin</h2>
+      <p>Enter administrative credentials to access applicant records</p>
+      
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label>Username / User ID</label>
+          <input type="text" id="adminUser" class="form-control" placeholder="Enter User ID" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="adminPass" class="form-control" placeholder="Enter Password" required />
+        </div>
+        <button type="submit" class="btn-login">Login to Dashboard &rarr;</button>
+        <div class="error-msg" id="loginError">Invalid Credentials! Sothik User ID o Password likhun.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. ADMIN DASHBOARD -->
+  <div class="dashboard-wrapper" id="dashboardScreen">
+    <header class="dash-nav">
+      <h1>Kaliyaganj Yuva Mahamandal &bull; Camp Portal</h1>
+      <div class="dash-actions">
+        <button class="btn-action btn-refresh" onclick="fetchApplicantsData()">&#8635; Refresh Data</button>
+        <button class="btn-action" onclick="exportToCSV()">Export Excel (CSV)</button>
+        <button class="btn-action btn-clear-all" onclick="clearAllData()">Wipe All</button>
+        <button class="btn-action btn-logout" onclick="handleLogout()">Logout</button>
+      </div>
+    </header>
+
+    <main class="dash-container">
+      <!-- STATS COUNTERS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h4>Total Registrations</h4>
+          <div class="count" id="countTotal">0</div>
+        </div>
+        <div class="stat-card" style="border-left-color: #10b981;">
+          <h4>Half Day Camp</h4>
+          <div class="count" id="countHalfDay">0</div>
+        </div>
+        <div class="stat-card" style="border-left-color: #f59e0b;">
+          <h4>One Day Camp</h4>
+          <div class="count" id="countOneDay">0</div>
+        </div>
+        <div class="stat-card" style="border-left-color: #ef4444;">
+          <h4>Zonal Camp</h4>
+          <div class="count" id="countZonal">0</div>
+        </div>
+        <div class="stat-card" style="border-left-color: #6366f1;">
+          <h4>Annual Camp</h4>
+          <div class="count" id="countAnnual">0</div>
+        </div>
+      </div>
+
+      <!-- LIVE REGISTRATION ON / OFF CONTROLS -->
+      <div class="controls-card">
+        <h3 class="controls-heading">Camp Registration Live Controls (Portal ON / OFF)</h3>
+        <div class="controls-grid">
+          <!-- 0. Half Day Camp Switch -->
+          <div class="control-box halfday-box">
+            <div>
+              <span class="control-title" style="color: #166534;">Half Day Camp</span>
+              <small id="statusTextHalfDay" class="control-status-sub">Checking...</small>
+            </div>
+            <button id="toggleBtnHalfDay" class="btn-toggle-switch" onclick="toggleCampStatus('halfDay')">Checking...</button>
+          </div>
+
+          <!-- 1. One Day Switch -->
+          <div class="control-box oneday-box">
+            <div>
+              <span class="control-title" style="color: #9a3412;">One Day Camp</span>
+              <small id="statusTextOneDay" class="control-status-sub">Checking...</small>
+            </div>
+            <button id="toggleBtnOneDay" class="btn-toggle-switch" onclick="toggleCampStatus('oneDay')">Checking...</button>
+          </div>
+
+          <!-- 2. Zonal Switch -->
+          <div class="control-box zonal-box">
+            <div>
+              <span class="control-title" style="color: #991b1b;">Zonal Camp</span>
+              <small id="statusTextZonal" class="control-status-sub">Checking...</small>
+            </div>
+            <button id="toggleBtnZonal" class="btn-toggle-switch" onclick="toggleCampStatus('zonal')">Checking...</button>
+          </div>
+
+          <!-- 3. Annual Switch -->
+          <div class="control-box annual-box">
+            <div>
+              <span class="control-title" style="color: #3730a3;">Annual Camp</span>
+              <small id="statusTextAnnual" class="control-status-sub">Checking...</small>
+            </div>
+            <button id="toggleBtnAnnual" class="btn-toggle-switch" onclick="toggleCampStatus('annual')">Checking...</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER & SEARCH -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by name, phone, district, ID..." onkeyup="filterRecords()" />
+        </div>
+        <select class="filter-select" id="campFilter" onchange="filterRecords()">
+          <option value="All">All Camps (Sob Shibir)</option>
+          <option value="Half Day Camp">Half Day Camp</option>
+          <option value="One Day Camp">One Day Camp</option>
+          <option value="Zonal Camp">Zonal Camp</option>
+          <option value="Annual All India Camp">Annual Camp</option>
+        </select>
+      </div>
+
+      <!-- TABLE CONTAINER -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Camp</th>
+              <th>Applicant Name</th>
+              <th>Father's Name</th>
+              <th>Phone</th>
+              <th>ID Type & Number</th>
+              <th>Photo (Annual)</th>
+              <th>ID Doc (Annual)</th>
+              <th>Location</th>
+              <th>Class / Profession</th>
+              <th>Type</th>
+              <th style="text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="applicantTableBody">
+            <!-- Dynamic Data -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- LIGHTBOX IMAGE POPUP MODAL -->
+  <div class="image-modal-overlay" id="imageModal" onclick="closeImageModal()">
+    <div class="image-modal-box" onclick="event.stopPropagation()">
+      <span class="modal-close-icon" onclick="closeImageModal()">&times;</span>
+      <h4 id="imageModalTitle" style="margin-bottom:12px; color:var(--primary-blue); font-family:'Montserrat',sans-serif;">Document Preview</h4>
+      <img id="imageModalImg" src="" alt="Preview" />
+      <div style="margin-top:14px;">
+        <a id="imageModalDownload" href="" target="_blank" class="btn-action" style="padding:6px 14px; text-decoration:none; display:inline-block;">Open Full Size ↗️</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_CREDENTIALS = {
+      username: "admin",
+      password: "KVYM@2026"
+    };
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1RD2KA-abi6-9rdHzGW4QOS6TEqequeg",
+      authDomain: "abvym-bd6d5.firebaseapp.com",
+      projectId: "abvym-bd6d5",
+      storageBucket: "abvym-bd6d5.firebasestorage.app",
+      messagingSenderId: "371731986972",
+      appId: "1:371731986972:web:bdb9374706cd0fbf16fdd9",
+      measurementId: "G-56XCC5VDSN"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let registeredApplicants = [];
+    let campStatusConfig = { halfDay: false, oneDay: false, zonal: false, annual: false };
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+      const err = document.getElementById('loginError');
+
+      if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'block';
+        fetchApplicantsData();
+        listenCampStatus();
+      } else {
+        err.style.display = 'block';
+      }
+    }
+
+    function handleLogout() {
+      document.getElementById('dashboardScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminLoginForm').reset();
+    }
+
+    function listenCampStatus() {
+      db.collection("settings").doc("camp_controls").onSnapshot(doc => {
+        if (doc.exists) {
+          campStatusConfig = { ...campStatusConfig, ...doc.data() };
+        } else {
+          db.collection("settings").doc("camp_controls").set(campStatusConfig);
+        }
+        updateStatusUI();
+      }, err => console.warn(err));
+    }
+
+    function updateStatusUI() {
+      const renderBtn = (btnId, textId, isActive) => {
+        const btn = document.getElementById(btnId);
+        const text = document.getElementById(textId);
+        if (btn && text) {
+          btn.style.background = isActive ? 'var(--success-green)' : 'var(--danger-red)';
+          btn.style.color = '#fff';
+          btn.textContent = isActive ? 'OPEN / ON' : 'CLOSED / OFF';
+          text.textContent = isActive ? 'Status: ACTIVE (Accepting)' : 'Status: CLOSED (Inactive)';
+          text.style.color = isActive ? 'var(--success-green)' : 'var(--danger-red)';
+        }
+      };
+
+      renderBtn('toggleBtnHalfDay', 'statusTextHalfDay', campStatusConfig.halfDay);
+      renderBtn('toggleBtnOneDay', 'statusTextOneDay', campStatusConfig.oneDay);
+      renderBtn('toggleBtnZonal', 'statusTextZonal', campStatusConfig.zonal);
+      renderBtn('toggleBtnAnnual', 'statusTextAnnual', campStatusConfig.annual);
+    }
+
+    async function toggleCampStatus(campKey) {
+      const newVal = !campStatusConfig[campKey];
+      if (!confirm(`Are you sure you want to turn ${newVal ? 'ON' : 'OFF'} registration for ${campKey.toUpperCase()}?`)) return;
+
+      try {
+        await db.collection("settings").doc("camp_controls").set({ [campKey]: newVal }, { merge: true });
+      } catch (err) {
+        alert("Failed to update status in database!");
+      }
+    }
+
+    // Helper: Build Media Preview for Annual Camp Only
+    function renderMediaPreview(url, isAnnual, label) {
+      if (!isAnnual) {
+        return `<span class="badge-not-required">—</span>`;
+      }
+      if (!url || url === "Not Uploaded" || url === "Upload Failed") {
+        return `<span style="color:#ef4444; font-size:11px; font-weight:600;">Not Provided</span>`;
+      }
+
+      const isImage = url.match(/\.(jpeg|jpg|png|webp)($|\?)/i) || url.includes('/image/upload/');
+      
+      if (isImage) {
+        return `
+          <div class="doc-preview-wrapper">
+            <img src="${url}" class="thumb-img" alt="Thumbnail" onclick="openImageModal('${url}', '${label}')" title="Click to view full photo" />
+            <a href="${url}" target="_blank" class="btn-file-view">View ↗️</a>
+          </div>
+        `;
+      }
+
+      return `<a href="${url}" target="_blank" class="btn-pdf-link">&#128196; View Doc ↗️</a>`;
+    }
+
+    function openImageModal(url, label) {
+      document.getElementById('imageModalImg').src = url;
+      document.getElementById('imageModalTitle').textContent = label || 'Document Preview';
+      document.getElementById('imageModalDownload').href = url;
+      document.getElementById('imageModal').classList.add('active');
+    }
+
+    function closeImageModal() {
+      document.getElementById('imageModal').classList.remove('active');
+    }
+
+    async function fetchApplicantsData() {
+      registeredApplicants = [];
+      const tbody = document.getElementById('applicantTableBody');
+      tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:24px; color:#64748b;">Loading applicant records from database...</td></tr>`;
+
+      try {
+        const snapshot = await db.collection("camp_registrations").orderBy("submittedAt", "desc").get();
+        snapshot.forEach(doc => {
+          const item = doc.data();
+          item._id = doc.id;
+          registeredApplicants.push(item);
+        });
+      } catch (err) {
+        try {
+          const fallbackSnap = await db.collection("camp_registrations").get();
+          fallbackSnap.forEach(doc => {
+            const item = doc.data();
+            item._id = doc.id;
+            registeredApplicants.push(item);
+          });
+        } catch(e) {
+          console.error("Database read error:", e);
+        }
+      }
+
+      // Check localStorage fallbacks
+      const localBackups = JSON.parse(localStorage.getItem('offline_camp_records') || '[]');
+      localBackups.forEach((locItem, idx) => {
+        if (!registeredApplicants.some(r => (r.Applicant_Name === locItem.Applicant_Name && r.Phone_Number === locItem.Phone_Number))) {
+          locItem._localId = idx;
+          registeredApplicants.push(locItem);
+        }
+      });
+
+      renderTable(registeredApplicants);
+      updateCounts(registeredApplicants);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('applicantTableBody');
+      tbody.innerHTML = '';
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:32px; color:#64748b;">No registrations found in the database.</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const campType = item.Camp_Type || '';
+        const isAnnual = campType.includes('Annual');
+
+        let tagClass = 'tag-zonal';
+        if (campType.includes('Half Day')) tagClass = 'tag-halfday';
+        else if (campType.includes('One Day')) tagClass = 'tag-oneday';
+        else if (isAnnual) tagClass = 'tag-annual';
+
+        const idType = item.ID_Card_Type || item.Annual_Applicant_1_IDType || '-';
+        const rawIdNum = item.ID_Card_Number || item.Annual_Applicant_1_IDNum || '-';
+        const isAadhaar = /aadhaar|adhar/i.test(idType);
+        const idNum = (rawIdNum !== '-' && isAadhaar) ? '[Aadhaar Redacted]' : rawIdNum;
+
+        const idDisplay = (idType !== '-' || idNum !== '-') 
+          ? `<strong>${idType}</strong><br><small style="color:#475569;">${idNum}</small>` 
+          : '<span style="color:#94a3b8;">N/A</span>';
+
+        // Check Individual or Group keys for photo/doc
+        const photoUrl = item.Applicant_Photo || item.Annual_Applicant_1_Photo;
+        const idDocUrl = item.Applicant_ID_Doc || item.Annual_Applicant_1_IDDoc;
+
+        const photoCell = renderMediaPreview(photoUrl, isAnnual, 'Applicant Photo');
+        const idDocCell = renderMediaPreview(idDocUrl, isAnnual, 'ID Document Proof');
+
+        const applicantName = item.Applicant_Name || item.Annual_Applicant_1_Name || item.OneDay_Applicant_1_Name || item.HalfDay_Applicant_1_Name || item.Zonal_Applicant_1_Name || 'N/A';
+        const fatherName = item.Father_Name || item.Annual_Applicant_1_Father || item.OneDay_Applicant_1_Father || item.HalfDay_Applicant_1_Father || item.Zonal_Applicant_1_Father || 'N/A';
+        const phoneNumber = item.Phone_Number || item.Annual_Applicant_1_Phone || item.OneDay_Applicant_1_Phone || item.HalfDay_Applicant_1_Phone || item.Zonal_Applicant_1_Phone || 'N/A';
+        const district = item.District || item.Annual_Applicant_1_District || item.OneDay_Applicant_1_District || item.HalfDay_Applicant_1_District || item.Zonal_Applicant_1_District || '';
+        const studentClass = item.Student_Class || item.Annual_Applicant_1_Class || item.OneDay_Applicant_1_Class || item.HalfDay_Applicant_1_Class || item.Zonal_Applicant_1_Class || '-';
+        const profession = item.Profession || item.Annual_Applicant_1_Profession || item.OneDay_Applicant_1_Profession || item.HalfDay_Applicant_1_Profession || item.Zonal_Applicant_1_Profession || '-';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.Date || 'Recent'}</td>
+          <td><span class="tag-camp ${tagClass}">${campType || 'Camp'}</span></td>
+          <td><strong>${applicantName}</strong></td>
+          <td>${fatherName}</td>
+          <td><a href="tel:${phoneNumber}" style="color:#0b1a62; font-weight:700;">${phoneNumber}</a></td>
+          <td>${idDisplay}</td>
+          <td>${photoCell}</td>
+          <td>${idDocCell}</td>
+          <td>${item.City || ''}${item.City && district ? ', ' : ''}${district}</td>
+          <td>${studentClass} / ${profession}</td>
+          <td>${item.Participation_Type || 'Individual'}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-delete-row" onclick="deleteApplicantRecord('${item._id || ''}', ${item._localId !== undefined ? item._localId : -1})">&#128465; Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function updateCounts(data) {
+      document.getElementById('countTotal').textContent = data.length;
+      document.getElementById('countHalfDay').textContent = data.filter(d => (d.Camp_Type || '').includes('Half Day')).length;
+      document.getElementById('countOneDay').textContent = data.filter(d => (d.Camp_Type || '').includes('One Day')).length;
+      document.getElementById('countZonal').textContent = data.filter(d => (d.Camp_Type || '').includes('Zonal')).length;
+      document.getElementById('countAnnual').textContent = data.filter(d => (d.Camp_Type || '').includes('Annual')).length;
+    }
+
+    function filterRecords() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const campType = document.getElementById('campFilter').value;
+
+      const filtered = registeredApplicants.filter(item => {
+        const matchesCamp = (campType === 'All') || (item.Camp_Type || '').includes(campType);
+        const nameStr = (item.Applicant_Name || item.Annual_Applicant_1_Name || item.OneDay_Applicant_1_Name || item.HalfDay_Applicant_1_Name || item.Zonal_Applicant_1_Name || '').toLowerCase();
+        const phoneStr = (item.Phone_Number || item.Annual_Applicant_1_Phone || item.OneDay_Applicant_1_Phone || item.HalfDay_Applicant_1_Phone || item.Zonal_Applicant_1_Phone || '');
+        const distStr = (item.District || item.Annual_Applicant_1_District || item.OneDay_Applicant_1_District || item.HalfDay_Applicant_1_District || item.Zonal_Applicant_1_District || '').toLowerCase();
+        const idStr = (item.ID_Card_Number || item.Annual_Applicant_1_IDNum || '').toLowerCase();
+
+        return matchesCamp && (nameStr.includes(query) || phoneStr.includes(query) || distStr.includes(query) || idStr.includes(query));
+      });
+
+      renderTable(filtered);
+    }
+
+    async function deleteApplicantRecord(docId, localId) {
+      if (!confirm("Are you sure you want to permanently delete this applicant record?")) return;
+
+      if (docId) {
+        try {
+          await db.collection("camp_registrations").doc(docId).delete();
+        } catch (err) {
+          alert("Error deleting record from database!");
+          return;
+        }
+      }
+
+      let localList = JSON.parse(localStorage.getItem('offline_camp_records') || '[]');
+      if (localId !== -1 && localList[localId]) {
+        localList.splice(localId, 1);
+        localStorage.setItem('offline_camp_records', JSON.stringify(localList));
+      }
+
+      registeredApplicants = registeredApplicants.filter(item => item._id !== docId && (localId === -1 || item._localId !== localId));
+      renderTable(registeredApplicants);
+      updateCounts(registeredApplicants);
+    }
+
+    async function clearAllData() {
+      if (registeredApplicants.length === 0) return alert("No records to clear!");
+      if (prompt("Type 'DELETE' to confirm permanent database wipe:") !== "DELETE") return alert("Action canceled.");
+
+      try {
+        const snapshot = await db.collection("camp_registrations").get();
+        const batch = db.batch();
+        snapshot.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+      } catch (err) {
+        console.error(err);
+      }
+
+      localStorage.removeItem('offline_camp_records');
+      registeredApplicants = [];
+      renderTable([]);
+      updateCounts([]);
+      alert("All records wiped successfully.");
+    }
+
+    function exportToCSV() {
+      if (registeredApplicants.length === 0) return alert('No data to export!');
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Date,Camp Type,Participation,Applicant Name,Father Name,Phone,ID Type,ID Number,District,City,Class,Profession,Photo URL,ID Doc URL\n";
+
+      registeredApplicants.forEach(row => {
+        const idType = row.ID_Card_Type || row.Annual_Applicant_1_IDType || '';
+        const rawIdNum = row.ID_Card_Number || row.Annual_Applicant_1_IDNum || '';
+        const isAadhaar = /aadhaar|adhar/i.test(idType);
+        const idNum = isAadhaar ? '[Aadhaar Redacted]' : rawIdNum;
+
+        const name = row.Applicant_Name || row.Annual_Applicant_1_Name || row.OneDay_Applicant_1_Name || row.HalfDay_Applicant_1_Name || row.Zonal_Applicant_1_Name || '';
+        const father = row.Father_Name || row.Annual_Applicant_1_Father || row.OneDay_Applicant_1_Father || row.HalfDay_Applicant_1_Father || row.Zonal_Applicant_1_Father || '';
+        const phone = row.Phone_Number || row.Annual_Applicant_1_Phone || row.OneDay_Applicant_1_Phone || row.HalfDay_Applicant_1_Phone || row.Zonal_Applicant_1_Phone || '';
+        const district = row.District || row.Annual_Applicant_1_District || row.OneDay_Applicant_1_District || row.HalfDay_Applicant_1_District || row.Zonal_Applicant_1_District || '';
+        const studentClass = row.Student_Class || row.Annual_Applicant_1_Class || row.OneDay_Applicant_1_Class || row.HalfDay_Applicant_1_Class || row.Zonal_Applicant_1_Class || '';
+        const profession = row.Profession || row.Annual_Applicant_1_Profession || row.OneDay_Applicant_1_Profession || row.HalfDay_Applicant_1_Profession || row.Zonal_Applicant_1_Profession || '';
+        const photo = row.Applicant_Photo || row.Annual_Applicant_1_Photo || '';
+        const idDoc = row.Applicant_ID_Doc || row.Annual_Applicant_1_IDDoc || '';
+
+        csvContent += `"${row.Date || ''}","${row.Camp_Type || ''}","${row.Participation_Type || ''}","${name}","${father}","${phone}","${idType}","${idNum}","${district}","${row.City || ''}","${studentClass}","${profession}","${photo}","${idDoc}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `Mahamandal_Camp_Registrations_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>

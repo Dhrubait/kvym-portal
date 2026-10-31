@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training Camps - Kaliyaganj Vivekananda Yuva Mahamandal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase Compat Libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #0b1a62;
+      --nav-blue: #091448;
+      --saffron-orange: #f26522;
+      --saffron-light: #fff5ee;
+      --card-border: #e2e8f0;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 50%, #f1f5f9 100%);
+      color: var(--text-dark);
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-nav {
+      background-color: var(--nav-blue);
+      padding: 14px 24px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .top-nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s ease;
+    }
+
+    .top-nav a:hover { opacity: 0.85; }
+
+    .admin-link-nav {
+      color: #ffd166 !important;
+      border: 1px solid #ffd166;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11.5px !important;
+    }
+
+    .admin-link-nav:hover {
+      background: #ffd166;
+      color: var(--nav-blue) !important;
+    }
+
+    .content-container {
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 40px 20px 60px 20px;
+      flex-grow: 1;
+    }
+
+    .section-header { text-align: center; margin-bottom: 36px; }
+
+    .section-subtitle {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--saffron-orange);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 12px;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      border-radius: 2px;
+      background-color: var(--saffron-orange);
+    }
+
+    .camps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .camp-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .camp-card-link::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background-color: var(--saffron-orange);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .camp-card-link:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(11, 26, 98, 0.1);
+      border-color: #cbd5e1;
+    }
+
+    .camp-card-link:hover::before { opacity: 1; }
+    .camp-card-link:hover .camp-arrow { transform: translateX(6px); color: var(--saffron-orange); }
+    .camp-card-link:hover .camp-name { color: var(--saffron-orange); }
+
+    .camp-card-link.halfday-card { border: 1.5px solid #bbf7d0; background: #f0fdf4; }
+    .camp-card-link.oneday-card { border: 1.5px solid #fed7aa; background: #fffdfa; }
+    .camp-card-link.zonal-card { border: 1.5px solid #fed7aa; background: #fffdfa; }
+    .camp-card-link.annual-card { border: 1.5px solid #c7d2fe; background: #fafbff; }
+    .camp-card-link.annual-card::before { background-color: var(--primary-blue); opacity: 1; }
+
+    .card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .camp-badge {
+      display: inline-block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background-color: var(--saffron-light);
+      color: var(--saffron-orange);
+      border: 1px solid #fed7aa;
+    }
+
+    .camp-arrow {
+      font-size: 20px;
+      font-weight: 700;
+      color: #94a3b8;
+      transition: all 0.25s ease;
+    }
+
+    .camp-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 8px;
+      transition: color 0.2s ease;
+    }
+
+    .camp-desc {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .action-notice {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--saffron-orange);
+      letter-spacing: 0.4px;
+    }
+
+    /* Modal Popup Form Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(9, 20, 72, 0.78);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 760px;
+      max-height: 92vh;
+      border-radius: 12px;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      animation: modalSlideUp 0.3s ease-out;
+    }
+
+    @keyframes modalSlideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      background-color: var(--primary-blue);
+      color: #ffffff;
+      padding: 18px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--saffron-orange);
+    }
+
+    .modal-header.halfday-header { border-bottom: 3px solid #16a34a; }
+    .modal-header.oneday-header { border-bottom: 3px solid var(--saffron-orange); }
+    .modal-header.annual-header { border-bottom: 3px solid #6366f1; }
+
+    .modal-header h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      line-height: 1.3;
+    }
+
+    .modal-header h3 span {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #cbd5e1;
+      font-family: 'Noto Sans Bengali', sans-serif;
+      margin-top: 2px;
+    }
+
+    .close-modal-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 26px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .close-modal-btn:hover { color: var(--saffron-orange); }
+    .modal-body { padding: 24px; }
+
+    .camp-rules-box {
+      background: #fffaf0;
+      border: 1px solid #fed7aa;
+      border-left: 5px solid var(--saffron-orange);
+      padding: 16px 18px;
+      border-radius: 6px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #451a03;
+    }
+
+    .camp-rules-box.halfday-rules {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 5px solid #16a34a;
+      color: #14532d;
+    }
+
+    .camp-rules-box.annual-rules {
+      background: #f5f7ff;
+      border: 1px solid #c7d2fe;
+      border-left: 5px solid var(--primary-blue);
+      color: #1e1b4b;
+    }
+
+    .camp-rules-box h4 {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #9a3412;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px dashed #fdba74;
+      padding-bottom: 6px;
+    }
+
+    .camp-rules-box.halfday-rules h4 { color: #166534; border-bottom: 1px dashed #86efac; }
+    .camp-rules-box.annual-rules h4 { color: var(--primary-blue); border-bottom: 1px dashed #c7d2fe; }
+
+    .camp-rules-box ol {
+      margin-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .camp-rules-box ol li { font-weight: 500; }
+
+    .camp-notice-timing {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #fdba74;
+      font-size: 12px;
+      color: #7c2d12;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .camp-rules-box.halfday-rules .camp-notice-timing { border-top: 1px dashed #86efac; color: #166534; }
+    .camp-rules-box.annual-rules .camp-notice-timing { border-top: 1px dashed #c7d2fe; color: #3730a3; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 6px; }
+    .form-group label span { font-size: 12px; font-weight: 500; color: #64748b; }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(11, 26, 98, 0.1);
+    }
+
+    .form-row { display: flex; gap: 16px; }
+    .form-row .form-group { flex: 1; }
+
+    .age-preview {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--saffron-orange);
+      margin-top: 4px;
+      display: block;
+    }
+
+    .upload-field-box {
+      background: #f8fafc;
+      border: 1.5px dashed #94a3b8;
+      padding: 10px 12px;
+      border-radius: 6px;
+      transition: border-color 0.2s;
+    }
+
+    .upload-field-box:hover { border-color: var(--saffron-orange); }
+    .upload-field-box input[type="file"] { width: 100%; font-size: 12.5px; color: #475569; cursor: pointer; }
+    .upload-note { font-size: 11px; color: #64748b; margin-top: 4px; display: block; }
+
+    .applicant-entry-card {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-top: 4px solid var(--primary-blue);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 22px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .applicant-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .applicant-card-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .remove-applicant-btn {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .remove-applicant-btn:hover { background: #dc2626; color: #ffffff; }
+
+    .add-more-container { text-align: center; margin: 10px 0 24px 0; }
+
+    .add-more-btn {
+      background: #ffffff;
+      color: var(--primary-blue);
+      border: 2px dashed var(--primary-blue);
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .add-more-btn:hover {
+      background: #e2f1fc;
+      border-style: solid;
+      color: var(--saffron-orange);
+      border-color: var(--saffron-orange);
+    }
+
+    .official-declaration-box {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin: 22px 0 16px 0;
+    }
+
+    .declaration-heading {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .declaration-text {
+      font-size: 13px;
+      line-height: 1.8;
+      color: #1e293b;
+      text-align: justify;
+      margin-bottom: 14px;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #ffffff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px dashed #94a3b8;
+    }
+
+    .form-check input { margin-top: 4px; cursor: pointer; }
+    .form-check label { font-size: 12.5px; line-height: 1.6; color: #0f172a; cursor: pointer; font-weight: 700; }
+
+    .signature-card-box {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .date-meta { font-size: 12.5px; color: #475569; font-weight: 700; line-height: 1.6; }
+    .sign-meta-block { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .sign-image-wrapper { max-width: 140px; height: 48px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
+    .sign-image-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .sign-caption { font-size: 11.5px; font-weight: 700; color: var(--primary-blue); border-top: 1px solid #64748b; padding-top: 4px; min-width: 160px; }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--saffron-orange);
+      color: #ffffff;
+      border: none;
+      padding: 13px;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .submit-btn.halfday-btn { background: #16a34a; }
+    .submit-btn.halfday-btn:hover { background: #15803d; }
+    .submit-btn.annual-btn { background: var(--primary-blue); }
+    .submit-btn.annual-btn:hover { background: #050d33; }
+    .submit-btn:hover { background: #d85213; }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    /* Thank You Popup Modal Styles */
+    .thankyou-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(11, 26, 98, 0.82);
+      backdrop-filter: blur(6px);
+      z-index: 100000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .thankyou-modal-overlay.active { display: flex; }
+
+    .thankyou-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 460px;
+      border-radius: 14px;
+      padding: 32px 26px;
+      text-align: center;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+      position: relative;
+      animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-top: 5px solid #16a34a;
+    }
+
+    .thankyou-icon {
+      width: 68px;
+      height: 68px;
+      background: #dcfce7;
+      color: #16a34a;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);
+    }
+
+    .thankyou-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .thankyou-bengali-title {
+      font-family: 'Noto Sans Bengali', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #16a34a;
+      margin-bottom: 14px;
+    }
+
+    .thankyou-desc { font-size: 13px; color: #475569; line-height: 1.65; margin-bottom: 22px; }
+
+    .thankyou-close-btn {
+      background: var(--primary-blue);
+      color: #ffffff;
+      border: none;
+      padding: 11px 28px;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .thankyou-close-btn:hover { background: var(--saffron-orange); }
+
+    @media (max-width: 600px) {
+      .form-row { flex-direction: column; gap: 0; }
+      .content-container { padding: 30px 16px; }
+      .modal-body { padding: 16px; }
+      .signature-card-box { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .sign-meta-block { align-items: flex-start; }
+      .sign-caption { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <a href="index.html">&#8592; BACK TO HOME</a>
+    <a href="admin.html" class="admin-link-nav">&#128274; ADMIN PORTAL</a>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="content-container">
+    <div class="section-header">
+      <span class="section-subtitle">Kaliyaganj Vivekananda Yuva Mahamandal</span>
+      <h1 class="section-title">Youth Training Camps</h1>
+    </div>
+      
+    <div class="camps-list">
+      <!-- 1. Half Day Camp -->
+      <div class="camp-card-link halfday-card" onclick="handleCampClick('halfDay')">
+        <div class="card-top-row">
+          <span class="camp-badge" id="badgeHalfDay">Checking...</span>
+          <span class="camp-arrow">&#8594;</span>
+        </div>
+        <h2 class="camp-name" style="color: #15803d;">Half Day Camp</h2>
+        <p class="camp-desc">
+          A focused half-day orientation session designed for students and newcomers, introducing core values, concentration techniques, and youth discipline.
+        </p>
+        <span class="action-notice" id="noticeHalfDay">&#8594; View Details</span>
+      </div>
+
+      <!-- 2. One Day Camp -->
+      <div class="camp-card-link oneday-card" onclick="handleCampClick('oneDay')">
+        <div class="card-top-row">
+          <span class="camp-badge" id="badgeOneDay">Checking...</span>
+          <span class="camp-arrow">&#8594;</span>
+        </div>
+        <h2 class="camp-name">One Day Camp</h2>
+        <p class="camp-desc">
+          Intensive day-long character-building camp featuring study circles, self-discipline training, and youth discussions based on Swamiji's ideals.
+        </p>
+        <span class="action-notice" id="noticeOneDay">&#8594; View Details</span>
+      </div>
+
+      <!-- 3. Zonal Camp -->
+      <div class="camp-card-link zonal-card" onclick="handleCampClick('zonal')">
+        <div class="card-top-row">
+          <span class="camp-badge" id="badgeZonal">Checking...</span>
+          <span class="camp-arrow">&#8594;</span>
+        </div>
+        <h2 class="camp-name" style="color: var(--saffron-orange);">Zonal Camp</h2>
+        <p class="camp-desc">
+          Multi-branch gathering focusing on youth leadership, coordination, physical culture, and constructive social work across zones.
+        </p>
+        <span class="action-notice" id="noticeZonal">&#8594; View Details</span>
+      </div>
+
+      <!-- 4. Annual Camp -->
+      <div class="camp-card-link annual-card" onclick="handleCampClick('annual')">
+        <div class="card-top-row">
+          <span class="camp-badge" id="badgeAnnual">Checking...</span>
+          <span class="camp-arrow">&#8594;</span>
+        </div>
+        <h2 class="camp-name">Annual Camp</h2>
+        <p class="camp-desc">
+          The national flagship residential youth camp bringing delegates together for comprehensive man-making and nation-building training.
+        </p>
+        <span class="action-notice" id="noticeAnnual">&#8594; View Details</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== INACTIVE NOTICE MODAL ==================== -->
+  <div class="modal-overlay" id="inactiveNoticeModal" style="display: none; z-index: 100001;">
+    <div style="background: #ffffff; max-width: 560px; width: 100%; border-radius: 14px; padding: 32px 28px; text-align: left; box-shadow: 0 24px 50px rgba(0,0,0,0.35); border-top: 6px solid var(--saffron-orange); animation: modalSlideUp 0.3s ease; position: relative;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <span style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">
+          Upcoming Session &bull; শীঘ্র শুরু হবে
+        </span>
+        <button type="button" onclick="closeInactiveNotice()" style="background: none; border: none; font-size: 24px; font-weight: bold; color: #64748b; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <h3 id="noticeCampTitle" style="font-family: 'Montserrat', sans-serif; font-size: 19px; font-weight: 800; color: var(--primary-blue); text-transform: uppercase; margin-bottom: 4px;">
+        CAMP DETAILS
+      </h3>
+      <div id="noticeCampBanglaTitle" style="font-family: 'Noto Sans Bengali', sans-serif; font-size: 15px; font-weight: 700; color: var(--saffron-orange); margin-bottom: 16px;">
+        শিবির পরিচয় ও বিবরণ
+      </div>
+
+      <div id="noticeCampAbout" style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid var(--primary-blue); border-radius: 6px; padding: 14px 16px; margin-bottom: 18px; font-size: 13.5px; line-height: 1.7; color: #334155;">
+      </div>
+
+      <div style="background: #fffaf0; border: 1px dashed #fdba74; border-radius: 6px; padding: 12px 14px; margin-bottom: 22px; font-size: 13px; line-height: 1.6; color: #9a3412;">
+        <strong>অনলাইন আবেদন বিজ্ঞপ্তি:</strong> এই শিবিরের অনলাইন রেজিস্ট্রেশন প্রক্রিয়া বর্তমানে প্রস্তুত হচ্ছে এবং খুব শীঘ্রই আবেদন গ্রহণ শুরু হবে। নির্দিষ্ট তারিখ ও নির্ঘণ্ট এই পোর্টালে প্রকাশ করা হবে।
+      </div>
+
+      <div style="text-align: right;">
+        <button type="button" onclick="closeInactiveNotice()" style="background: var(--primary-blue); color: #ffffff; border: none; padding: 10px 24px; border-radius: 6px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; cursor: pointer;">
+          Close / বন্ধ করুন
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 0. HALF DAY CAMP FORM MODAL ==================== -->
+  <div class="modal-overlay" id="halfDayFormModal">
+    <div class="modal-container">
+      <div class="modal-header halfday-header">
+        <h3>
+          HALF DAY YOUTH TRAINING CAMP APPLICATION
+          <span>অর্ধদিবসীয় যুব প্রশিক্ষণ শিবির আবেদন পত্র</span>
+        </h3>
+        <button class="close-modal-btn" onclick="closeHalfDayForm()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="camp-rules-box halfday-rules">
+          <h4>নিয়মাবলী ও নির্দেশিকা (Half Day Camp Rules & Guidelines)</h4>
+          <ol>
+            <li>বিদ্যালয় ও মহাবিদ্যালয়ের আগ্রহী ছাত্র এবং যুবকরা এই শিবিরে যোগদান করতে পারবেন। নূন্যতম অষ্টম-নবম শ্রেণীর ছাত্র বা ১৪ বৎসরের ঊর্ধ্বে শিক্ষার্থীরা যোগ দিতে পারবেন।</li>
+            <li>ব্যক্তিগতভাবে অথবা শিক্ষা প্রতিষ্ঠান বা স্থানীয় ক্লাবের মাধ্যমে আবেদনপত্র জমা দেওয়া যাবে।</li>
+            <li>শিবিরে আলোচনা ও পাঠচক্রের গুরুত্বপূর্ণ অংশ লিপিবদ্ধ করার জন্য নিজস্ব নোটবুক ও কলম সঙ্গে আনা আবশ্যক।</li>
+            <li>শিবির চলাকালীন শান্ত ও সুশৃঙ্খল পরিবেশ বজায় রাখা এবং মোবাইল ফোন সাইলেন্ট/বন্ধ রাখা বাধ্যতামূলক।</li>
+            <li>অর্ধদিবসের অধিবেশনে চরিত্র গঠন, একাগ্রতা বৃদ্ধি এবং স্বামীজীর আদর্শ বিষয়ক আলোচনায় সক্রিয় অংশগ্রহণ করতে হবে।</li>
+          </ol>
+          <div class="camp-notice-timing">
+            * স্থানীয় কার্যালয়: কালিয়াগঞ্জ বিবেকানন্দ যুব মহামণ্ডল, কলেজ পাড়া, কালিয়াগঞ্জ, উত্তর দিনাজপুর, ৭৩৩১২৯
+          </div>
+        </div>
+
+        <form id="halfDayRegistrationForm" action="https://formspree.io/f/xkjjbylo" method="POST" onsubmit="handleUniversalSubmit(event, 'Half Day')">
+          <input type="hidden" name="Camp_Type" value="Half Day Camp" />
+          
+          <div class="form-group">
+            <label>Participation Type <span>(আবেদনের ধরন)</span> *</label>
+            <select class="form-control" name="Participation_Type" id="halfDayPartSelect" onchange="toggleHalfDayMode(this.value)" required>
+              <option value="" disabled selected>-- Select Participation Type / নির্বাচন করুন --</option>
+              <option value="Individual">Individual (ব্যক্তিগতভাবে)</option>
+              <option value="Institution">Through Institution / Group (প্রতিষ্ঠানের মাধ্যমে)</option>
+            </select>
+          </div>
+
+          <div id="halfDayInstitutionBlock" style="display: none;">
+            <div class="form-group">
+              <label>Institution / Unit / School Name <span>(শিক্ষা প্রতিষ্ঠান বা সংস্থার নাম)</span> *</label>
+              <input type="text" class="form-control" name="Institution_Name" id="halfDayInstName" placeholder="Enter school / college / organization name" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Institution Contact Person <span>(প্রতিনিধি / দায়িত্বপ্রাপ্ত ব্যক্তি)</span> *</label>
+                <input type="text" class="form-control" name="Institution_Contact_Person" id="halfDayInstContact" placeholder="Name of Teacher / In-charge" />
+              </div>
+              <div class="form-group">
+                <label>Institution Phone No <span>(যোগাযোগের নম্বর)</span> *</label>
+                <input type="tel" class="form-control" name="Institution_Phone" id="halfDayInstPhone" placeholder="+91 XXXXXXXXXX" />
+              </div>
+            </div>
+          </div>
+
+          <div id="halfDayIndividualSection" style="display: none;">
+            <div class="form-group">
+              <label>Applicant Full Name <span>(শিক্ষার্থীর পুরো নাম)</span> *</label>
+              <input type="text" class="form-control h-ind-req" name="Applicant_Name" placeholder="Enter full name" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Father's Name <span>(পিতার নাম)</span> *</label>
+                <input type="text" class="form-control h-ind-req" name="Father_Name" placeholder="Enter father's name" />
+              </div>
+              <div class="form-group">
+                <label>Mother's Name <span>(মাতার নাম)</span></label>
+                <input type="text" class="form-control h-ind-req" name="Mother_Name" placeholder="Enter mother's name" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone / WhatsApp No <span>(ফোন নং)</span> *</label>
+                <input type="tel" class="form-control h-ind-req" name="Phone_Number" placeholder="+91 XXXXXXXXXX" />
+              </div>
+              <div class="form-group">
+                <label>Date of Birth <span>(জন্ম তারিখ)</span> *</label>
+                <input type="date" class="form-control h-ind-req" name="Date_Of_Birth" onchange="calculateSingleAge(this.value, 'ageDisplayHalfDayInd', 14)" />
+                <span id="ageDisplayHalfDayInd" class="age-preview"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Street / Village Address <span>(রাস্তা / গ্রাম / পাড়া)</span> *</label>
+              <input type="text" class="form-control h-ind-req" name="Street_Address" placeholder="Enter house no, street or village" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>State <span>(রাজ্য)</span> *</label>
+                <select class="form-control h-ind-req" name="State">
+                  <option value="" disabled selected>-- Select State / রাজ্য নির্বাচন করুন --</option>
+                  <option value="West Bengal">West Bengal (পশ্চিমবঙ্গ)</option>
+                  <option value="Assam">Assam (আসাম)</option>
+                  <option value="Bihar">Bihar (বিহার)</option>
+                  <option value="Jharkhand">Jharkhand (ঝাড়খণ্ড)</option>
+                  <option value="Odisha">Odisha (ওড়িশা)</option>
+                  <option value="Other">Other State (অন্যান্য)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>District <span>(জেলা - West Bengal)</span> *</label>
+                <select class="form-control h-ind-req" name="District">
+                  <option value="" disabled selected>-- Select District / জেলা নির্বাচন করুন --</option>
+                  <option value="Uttar Dinajpur">Uttar Dinajpur (উত্তর দিনাজপুর)</option>
+                  <option value="Dakshin Dinajpur">Dakshin Dinajpur (দক্ষিণ দিনাজপুর)</option>
+                  <option value="Malda">Malda (মালদা)</option>
+                  <option value="Darjeeling">Darjeeling (দার্জিলিং)</option>
+                  <option value="Jalpaiguri">Jalpaiguri (জলপাইগুড়ি)</option>
+                  <option value="Alipurduar">Alipurduar (আলipurদুয়ার)</option>
+                  <option value="Cooch Behar">Cooch Behar (কোচবিহার)</option>
+                  <option value="Kalimpong">Kalimpong (কালিম্পং)</option>
+                  <option value="Murshidabad">Murshidabad (মুর্শিদাবাদ)</option>
+                  <option value="Nadia">Nadia (নদিয়া)</option>
+                  <option value="Birbhum">Birbhum (বীরভূম)</option>
+                  <option value="Bankura">Bankura (বাঁকুড়া)</option>
+                  <option value="Purulia">Purulia (পুরুলিয়া)</option>
+                  <option value="Paschim Bardhaman">Paschim Bardhaman (পশ্চিম বর্ধমান)</option>
+                  <option value="Purba Bardhaman">Purba Bardhaman (পূর্ব বর্ধমান)</option>
+                  <option value="Hooghly">Hooghly (হুগলি)</option>
+                  <option value="Howrah">Howrah (হাওড়া)</option>
+                  <option value="Kolkata">Kolkata (কলকাতা)</option>
+                  <option value="North 24 Parganas">North 24 Parganas (উত্তর ২৪ পরগনা)</option>
+                  <option value="South 24 Parganas">South 24 Parganas (দক্ষিণ ২৪ পরগনা)</option>
+                  <option value="Paschim Medinipur">Paschim Medinipur (পশ্চিম মেদিনীপুর)</option>
+                  <option value="Purba Medinipur">Purba Medinipur (পূর্ব মেদিনীপুর)</option>
+                  <option value="Jhargram">Jhargram (ঝাড়গ্রাম)</option>
+                  <option value="Other">Other District (অন্যান্য জেলা)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>City / Town / Block <span>(শহর / ব্লক)</span> *</label>
+                <input type="text" class="form-control h-ind-req" name="City" placeholder="e.g. Kaliyaganj" />
+              </div>
+              <div class="form-group">
+                <label>PIN Code <span>(পিন কোড)</span> *</label>
+                <input type="text" class="form-control h-ind-req" name="PIN_Code" placeholder="733129" maxlength="6" pattern="[0-9]{6}" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Student Class <span>(ছাত্র হলে কোন শ্রেণী)</span></label>
+                <input type="text" class="form-control" name="Student_Class" placeholder="e.g. Class 8 / 9 / 10 / 11 / 12" />
+              </div>
+              <div class="form-group">
+                <label>Profession / Occupation <span>(বর্তমান পেশা)</span></label>
+                <input type="text" class="form-control" name="Profession" placeholder="e.g. Student" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Prior Camp Experience <span>(পূর্বের শিবির অভিজ্ঞতা)</span></label>
+              <select class="form-control" name="Prior_Experience">
+                <option value="No">No / First Time (না / প্রথমবার)</option>
+                <option value="Yes">Yes (হ্যাঁ)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="halfDayGroupSection" style="display: none;">
+            <div id="halfDayApplicantsContainer"></div>
+            <div class="add-more-container">
+              <button type="button" class="add-more-btn" onclick="addNewHalfDayApplicantCard()">
+                + Add More Applicant (আরও শিক্ষার্থী যোগ করুন)
+              </button>
+            </div>
+          </div>
+
+          <div class="official-declaration-box">
+            <div class="declaration-heading">
+              সম্পাদক, <br>
+              কালিয়াগঞ্জ বিবেকানন্দ যুব মহামন্ডল <br>
+              (অখিল ভারত বিবেকানন্দ যুব মহামন্ডলের ভাবাদর্শে পরিচালিত)
+            </div>
+            <p class="declaration-text">
+              <strong>মহাশয়,</strong> আমি / আমরা অর্ধদিবসীয় যুব প্রশিক্ষণ শিবিরের উদ্দেশ্য এবং নিয়মাবলী জেনেছি। আমি / আমরা উক্ত নিয়মাবলী মেনে চলবো এবং শিবিরে শিক্ষার্থী হিসেবে যোগদানের অনুমতি দিলে বাধিত হব।
+            </p>
+            <div class="form-check">
+              <input type="checkbox" id="halfDayRulesAgree" required />
+              <label for="halfDayRulesAgree">
+                আমি অঙ্গীকার করছি যে উল্লেখিত বিবরণ সঠিক এবং আমি শিবিরের নিয়মাবলী মেনে চলব (I declare and accept all rules) *
+              </label>
+            </div>
+          </div>
+
+          <div class="signature-card-box">
+            <div class="date-meta">
+              <strong>তারিখ (Date):</strong> <span class="currentFormDateDisplay"></span><br>
+              <small style="color: #64748b;">Kaliyaganj Centre Unit</small>
+            </div>
+            <div class="sign-meta-block">
+              <div class="sign-image-wrapper">
+                <img src="sign.jpeg" alt="Authorized Signature" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                <span style="display:none; font-family: 'Brush Script MT', cursive; font-size: 24px; color: #0b1a62;">Sudipta Sarkar</span>
+              </div>
+              <div class="sign-caption">আবেদনকারী / অনুমোদিত স্বাক্ষর</div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn halfday-btn">Submit Half Day Camp Application (আবেদন জমা দিন)</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 1. ONE DAY CAMP FORM MODAL ==================== -->
+  <div class="modal-overlay" id="oneDayFormModal">
+    <div class="modal-container">
+      <div class="modal-header oneday-header">
+        <h3>
+          ONE DAY YOUTH TRAINING CAMP APPLICATION
+          <span>একদিবসীয় যুব প্রশিক্ষণ শিবির আবেদন পত্র</span>
+        </h3>
+        <button class="close-modal-btn" onclick="closeOneDayForm()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="camp-rules-box">
+          <h4>নিয়মাবলী ও নির্দেশিকা (One Day Camp Rules & Guidelines)</h4>
+          <ol>
+            <li>শিবিরে পুরুষ ও ছাত্র যুবকরা অংশগ্রহণ করতে পারবেন। নূন্যতম নবম-দশম শ্রেণীর ছাত্র বা ১৫-১৬ বৎসরের ঊর্ধ্বে শিক্ষার্থীরা যোগ দিতে পারবেন।</li>
+            <li>ব্যক্তিগতভাবে অথবা শিক্ষা প্রতিষ্ঠান বা সংস্থার মাধ্যমে আবেদনপত্র জমা দেওয়া যাবে।</li>
+            <li>একদিবসীয় শিবিরের ক্ষেত্রে নিজস্ব হালকা নোটবুক, পেন এবং প্রয়োজনীয় ব্যক্তিগত জিনিসপত্র সঙ্গে আনা বাঞ্ছনীয়।</li>
+            <li>শিবির চলাকালীন শৃঙ্খলা রক্ষা করা এবং মোবাইল ফোন ব্যবহার থেকে বিরত থাকা আবশ্যক।</li>
+            <li>দিনব্যাপী বিভিন্ন অধিবেশনে স্বামী বিবেকানন্দের চরিত্র গঠন ও মানুষ গড়ার আদর্শ ভিত্তিক পাঠচক্র, যোগাসন/শরীরচর্চা ও যুব আলোচনায় সক্রিয় অংশগ্রহণ করতে হবে।</li>
+          </ol>
+          <div class="camp-notice-timing">
+            * স্থানীয় কার্যালয়: কালিয়াগঞ্জ বিবেকানন্দ যুব মহামণ্ডল, কলেজ পাড়া, কালিয়াগঞ্জ, উত্তর দিনাজপুর, ৭৩৩১২৯
+          </div>
+        </div>
+
+        <form id="oneDayRegistrationForm" action="https://formspree.io/f/xkjjbylo" method="POST" onsubmit="handleUniversalSubmit(event, 'One Day')">
+          <input type="hidden" name="Camp_Type" value="One Day Camp" />
+          
+          <div class="form-group">
+            <label>Participation Type <span>(আবেদনের ধরন)</span> *</label>
+            <select class="form-control" name="Participation_Type" id="oneDayPartSelect" onchange="toggleOneDayMode(this.value)" required>
+              <option value="" disabled selected>-- Select Participation Type / নির্বাচন করুন --</option>
+              <option value="Individual">Individual (ব্যক্তিগতভাবে)</option>
+              <option value="Institution">Through Institution / Group (প্রতিষ্ঠানের মাধ্যমে)</option>
+            </select>
+          </div>
+
+          <div id="oneDayInstitutionBlock" style="display: none;">
+            <div class="form-group">
+              <label>Institution / Unit / School Name <span>(শিক্ষা প্রতিষ্ঠান বা সংস্থার নাম)</span> *</label>
+              <input type="text" class="form-control" name="Institution_Name" id="oneDayInstName" placeholder="Enter school / college / organization name" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Institution Contact Person <span>(প্রতিনিধি / দায়িত্বপ্রাপ্ত ব্যক্তি)</span> *</label>
+                <input type="text" class="form-control" name="Institution_Contact_Person" id="oneDayInstContact" placeholder="Name of Teacher / In-charge" />
+              </div>
+              <div class="form-group">
+                <label>Institution Phone No <span>(যোগাযোগের নম্বর)</span> *</label>
+                <input type="tel" class="form-control" name="Institution_Phone" id="oneDayInstPhone" placeholder="+91 XXXXXXXXXX" />
+              </div>
+            </div>
+          </div>
+
+          <div id="oneDayIndividualSection" style="display: none;">
+            <div class="form-group">
+              <label>Applicant Full Name <span>(শিক্ষার্থীর পুরো নাম)</span> *</label>
+              <input type="text" class="form-control o-ind-req" name="Applicant_Name" placeholder="Enter full name" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Father's Name <span>(পিতার নাম)</span> *</label>
+                <input type="text" class="form-control o-ind-req" name="Father_Name" placeholder="Enter father's name" />
+              </div>
+              <div class="form-group">
+                <label>Mother's Name <span>(মাতার নাম)</span></label>
+                <input type="text" class="form-control o-ind-req" name="Mother_Name" placeholder="Enter mother's name" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone / WhatsApp No <span>(ফোন নং)</span> *</label>
+                <input type="tel" class="form-control o-ind-req" name="Phone_Number" placeholder="+91 XXXXXXXXXX" />
+              </div>
+              <div class="form-group">
+                <label>Date of Birth <span>(জন্ম তারিখ)</span> *</label>
+                <input type="date" class="form-control o-ind-req" name="Date_Of_Birth" onchange="calculateSingleAge(this.value, 'ageDisplayOneDayInd', 15)" />
+                <span id="ageDisplayOneDayInd" class="age-preview"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Street / Village Address <span>(রাস্তা / গ্রাম / পাড়া)</span> *</label>
+              <input type="text" class="form-control o-ind-req" name="Street_Address" placeholder="Enter house no, street or village" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>State <span>(রাজ্য)</span> *</label>
+                <select class="form-control o-ind-req" name="State">
+                  <option value="" disabled selected>-- Select State / রাজ্য নির্বাচন করুন --</option>
+                  <option value="West Bengal">West Bengal (পশ্চিমবঙ্গ)</option>
+                  <option value="Assam">Assam (আসাম)</option>
+                  <option value="Bihar">Bihar (বিহার)</option>
+                  <option value="Jharkhand">Jharkhand (ঝাড়খণ্ড)</option>
+                  <option value="Odisha">Odisha (ওড়িশা)</option>
+                  <option value="Other">Other State (অন্যান্য)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>District <span>(জেলা - West Bengal)</span> *</label>
+                <select class="form-control o-ind-req" name="District">
+                  <option value="" disabled selected>-- Select District / জেলা নির্বাচন করুন --</option>
+                  <option value="Uttar Dinajpur">Uttar Dinajpur (উত্তর দিনাজপুর)</option>
+                  <option value="Dakshin Dinajpur">Dakshin Dinajpur (দক্ষিণ দিনাজপুর)</option>
+                  <option value="Malda">Malda (মালদা)</option>
+                  <option value="Darjeeling">Darjeeling (দার্জিলিং)</option>
+                  <option value="Jalpaiguri">Jalpaiguri (জলপাইগুড়ি)</option>
+                  <option value="Alipurduar">Alipurduar (আলipurদুয়ার)</option>
+                  <option value="Cooch Behar">Cooch Behar (কোচবিহার)</option>
+                  <option value="Kalimpong">Kalimpong (কালিম্পং)</option>
+                  <option value="Murshidabad">Murshidabad (মুর্শিদাবাদ)</option>
+                  <option value="Nadia">Nadia (নদিয়া)</option>
+                  <option value="Birbhum">Birbhum (বীরভূম)</option>
+                  <option value="Bankura">Bankura (বাঁকুড়া)</option>
+                  <option value="Purulia">Purulia (পুরুলিয়া)</option>
+                  <option value="Paschim Bardhaman">Paschim Bardhaman (পশ্চিম বর্ধমান)</option>
+                  <option value="Purba Bardhaman">Purba Bardhaman (পূর্ব বর্ধমান)</option>
+                  <option value="Hooghly">Hooghly (হুগলি)</option>
+                  <option value="Howrah">Howrah (হাওড়া)</option>
+                  <option value="Kolkata">Kolkata (কলকাতা)</option>
+                  <option value="North 24 Parganas">North 24 Parganas (উত্তর ২৪ পরগনা)</option>
+                  <option value="South 24 Parganas">South 24 Parganas (দক্ষিণ ২৪ পরগনা)</option>
+                  <option value="Paschim Medinipur">Paschim Medinipur (পশ্চিম মেদিনীপুর)</option>
+                  <option value="Purba Medinipur">Purba Medinipur (পূর্ব মেদিনীপুর)</option>
+                  <option value="Jhargram">Jhargram (ঝাড়গ্রাম)</option>
+                  <option value="Other">Other District (অন্যান্য জেলা)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>City / Town / Block <span>(শহর / ব্লক)</span> *</label>
+                <input type="text" class="form-control o-ind-req" name="City" placeholder="e.g. Kaliyaganj" />
+              </div>
+              <div class="form-group">
+                <label>PIN Code <span>(পিন কোড)</span> *</label>
+                <input type="text" class="form-control o-ind-req" name="PIN_Code" placeholder="733129" maxlength="6" pattern="[0-9]{6}" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Student Class <span>(ছাত্র হলে কোন শ্রেণী)</span></label>
+                <input type="text" class="form-control" name="Student_Class" placeholder="e.g. Class 9 / 10 / 12 / College / NA" />
+              </div>
+              <div class="form-group">
+                <label>Profession / Occupation <span>(বর্তমান পেশা)</span></label>
+                <input type="text" class="form-control" name="Profession" placeholder="e.g. Student / Private Job / Business" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Prior Camp Experience <span>(পূর্বের শিবির অভিজ্ঞতা)</span></label>
+              <select class="form-control" name="Prior_Experience">
+                <option value="No">No / First Time (না / প্রথমবার)</option>
+                <option value="Yes">Yes (হ্যাঁ)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="oneDayGroupSection" style="display: none;">
+            <div id="oneDayApplicantsContainer"></div>
+            <div class="add-more-container">
+              <button type="button" class="add-more-btn" onclick="addNewOneDayApplicantCard()">
+                + Add More Applicant (আরও শিক্ষার্থী যোগ করুন)
+              </button>
+            </div>
+          </div>
+
+          <div class="official-declaration-box">
+            <div class="declaration-heading">
+              সম্পাদক, <br>
+              কালিয়াগঞ্জ বিবেকানন্দ যুব মহামন্ডল <br>
+              (অখিল ভারত বিবেকানন্দ যুব মহামন্ডলের ভাবাদর্শে পরিচালিত)
+            </div>
+            <p class="declaration-text">
+              <strong>মহাশয়,</strong> আমি / আমরা একদিবসীয় যুব প্রশিক্ষণ শিবিরের উদ্দেশ্য এবং নিয়মাবলী জেনেছি। আমি / আমরা উক্ত নিয়মাবলী মেনে চলবো এবং শিবিরে শিক্ষার্থী হিসেবে যোগদানের অনুমতি দিলে বাধিত হব।
+            </p>
+            <div class="form-check">
+              <input type="checkbox" id="oneDayRulesAgree" required />
+              <label for="oneDayRulesAgree">
+                আমি অঙ্গীকার করছি যে উল্লেখিত বিবরণ সঠিক এবং আমি শিবিরের নিয়মাবলী মেনে চলব (I declare and accept all rules) *
+              </label>
+            </div>
+          </div>
+
+          <div class="signature-card-box">
+            <div class="date-meta">
+              <strong>তারিখ (Date):</strong> <span class="currentFormDateDisplay"></span><br>
+              <small style="color: #64748b;">Kaliyaganj Centre Unit</small>
+            </div>
+            <div class="sign-meta-block">
+              <div class="sign-image-wrapper">
+                <img src="sign.jpeg" alt="Authorized Signature" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                <span style="display:none; font-family: 'Brush Script MT', cursive; font-size: 24px; color: #0b1a62;">Sudipta Sarkar</span>
+              </div>
+              <div class="sign-caption">আবেদনকারী / অনুমোদিত স্বাক্ষর</div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">Submit One Day Camp Application (আবেদন জমা দিন)</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. ZONAL CAMP FORM MODAL ==================== -->
+  <div class="modal-overlay" id="zonalFormModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>
+          ZONAL YOUTH TRAINING CAMP APPLICATION
+          <span>আঞ্চলিক যুব প্রশিক্ষণ শিবির আবেদন পত্র</span>
+        </h3>
+        <button class="close-modal-btn" onclick="closeZonalForm()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="camp-rules-box">
+          <h4>নিয়মাবলী ও নির্দেশিকা (Camp Rules & Guidelines)</h4>
+          <ol>
+            <li>শিবিরে কেবলমাত্র পুরুষরাই যোগদান করতে পারবেন। কমপক্ষে দশম শ্রেণীর ছাত্র বা ১৬ বৎসরের ঊর্ধ্বে আগ্রহী যে কোন ব্যক্তি শিবিরে যোগ দিতে পারবেন।</li>
+            <li>ব্যক্তি বা প্রতিষ্ঠান শিক্ষার্থী সম্পর্কিত তথ্যাদি জানিয়ে শিবিরে যোগদানের জন্য আবেদন করতে পারবেন।</li>
+            <li>অনলাইনে বা উল্লেখিত ঠিকানায় আবেদনপত্র জমা দিতে হবে।</li>
+            <li>শিবিরে পৌঁছে শিক্ষার্থীকে ১৫০ টাকা (অনুপার্জনশীল ব্যক্তিদের ক্ষেত্রে) / সামর্থ্য অনুসারে ৩০০ টাকা বা ৫০০ টাকা (উপার্জনশীল ব্যক্তিদের ক্ষেত্রে) জমা দিতে হবে।</li>
+            <li>থাকা-খাওয়ার জন্য অতিরিক্ত কোন অর্থ দিতে হবে না। যাতায়াতের ব্যয় শিক্ষার্থীকে বহন করতে হবে।</li>
+            <li>হালকা বিছানা, মশারি, খাওয়ার থালা, গ্লাস ও অন্যান্য নিজস্ব ব্যবহার্য জিনিস সঙ্গে আনতে হবে।</li>
+            <li>সম্ভব হলে প্যারেড ও শরীরচর্চার জন্য সাদা পোশাক ও কেডস আনতে পারেন।</li>
+            <li>শিক্ষার্থীকে প্রত্যেক অনুষ্ঠানে অবশ্যই অংশগ্রহণ করতে হবে এবং প্রত্যেক ক্লাসের নোট নেওয়া বাঞ্ছনীয়।</li>
+            <li>শিবির শিক্ষার্থীদের মোবাইল ব্যবহার নিষিদ্ধ। বিশেষ প্রয়োজনে বাড়িতে যোগাযোগের জন্য শিবির কার্যালয়ে ব্যবস্থা থাকবে।</li>
+            <li>শিবিরে রামকৃষ্ণ-বিবেকানন্দ সাহিত্য ও মহামণ্ডল প্রকাশিত জীবনগঠনের সহায়ক পুস্তকের একটি বিক্রয়কেন্দ্র এবং বিভিন্ন প্রদর্শনী থাকবে।</li>
+            <li>প্রত্যহ সান্ধ্য অনুষ্ঠানে বিশিষ্ট বক্তাগণ স্বামী বিবেকানন্দ এবং অন্যান্য প্রাসঙ্গিক বিষয় সম্পর্কে আলোচনা করবেন এবং তারপর সাংস্কৃতিক অনুষ্ঠানের ব্যবস্থা থাকবে।</li>
+          </ol>
+          <div class="camp-notice-timing">
+            * স্থানীয় কার্যালয়: কালিয়াগঞ্জ বিবেকানন্দ যুব মহামণ্ডল, কলেজ পাড়া, কালিয়াগঞ্জ, উত্তর দিনাজপুর, ৭৩৩১২৯
+          </div>
+        </div>
+
+        <form id="zonalRegistrationForm" action="https://formspree.io/f/xkjjbylo" method="POST" onsubmit="handleUniversalSubmit(event, 'Zonal')">
+          <input type="hidden" name="Camp_Type" value="Zonal Camp" />
+          
+          <div class="form-group">
+            <label>Participation Type <span>(আবেদনের ধরন)</span> *</label>
+            <select class="form-control" name="Participation_Type" id="zonalPartSelect" onchange="toggleZonalMode(this.value)" required>
+              <option value="" disabled selected>-- Select Participation Type / নির্বাচন করুন --</option>
+              <option value="Individual">Individual (ব্যক্তিগতভাবে)</option>
+              <option value="Institution">Through Institution / Group (প্রতিষ্ঠানের মাধ্যমে)</option>
+            </select>
+          </div>
+
+          <div id="zonalInstitutionBlock" style="display: none;">
+            <div class="form-group">
+              <label>Institution / Unit / School Name <span>(শিক্ষা প্রতিষ্ঠান বা সংস্থার নাম)</span> *</label>
+              <input type="text" class="form-control" name="Institution_Name" id="zonalInstName" placeholder="Enter school / college / organization name" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Institution Contact Person <span>(প্রতিনিধি / দায়িত্বপ্রাপ্ত ব্যক্তি)</span> *</label>
+                <input type="text" class="form-control" name="Institution_Contact_Person" id="zonalInstContact" placeholder="Name of Teacher / In-charge" />
+              </div>
+              <div class="form-group">
+                <label>Institution Phone No <span>(যোগাযোগের নম্বর)</span> *</label>
+                <input type="tel" class="form-control" name="Institution_Phone" id="zonalInstPhone" placeholder="+91 XXXXXXXXXX" />
+              </div>
+            </div>
+          </div>
+
+          <div id="zonalIndividualSection" style="display: none;">
+            <div class="form-group">
+              <label>Applicant Full Name <span>(শিক্ষার্থীর পুরো নাম)</span> *</label>
+              <input type="text" class="form-control z-ind-req" name="Applicant_Name" placeholder="Enter full name" />
+            </div>
+
+            <div class="form-group">
+              <label>Father's Name <span>(পিতার নাম)</span> *</label>
+              <input type="text" class="form-control z-ind-req" name="Father_Name" placeholder="Enter father's name" />
+            </div>
+
+            <div class="form-group">
+              <label>Mother's Name <span>(মাতার নাম)</span></label>
+              <input type="text" class="form-control z-ind-req" name="Mother_Name" placeholder="Enter mother's name" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone / WhatsApp No <span>(ফোন নং)</span> *</label>
+                <input type="tel" class="form-control z-ind-req" name="Phone_Number" placeholder="+91 XXXXXXXXXX" />
+              </div>
+              <div class="form-group">
+                <label>Date of Birth <span>(জন্ম তারিখ)</span> *</label>
+                <input type="date" class="form-control z-ind-req" name="Date_Of_Birth" onchange="calculateSingleAge(this.value, 'ageDisplayZonalInd', 16)" />
+                <span id="ageDisplayZonalInd" class="age-preview"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Street / Village Address <span>(রাস্তা / গ্রাম / পাড়া)</span> *</label>
+              <input type="text" class="form-control z-ind-req" name="Street_Address" placeholder="Enter house no, street or village" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>State <span>(রাজ্য)</span> *</label>
+                <select class="form-control z-ind-req" name="State">
+                  <option value="" disabled selected>-- Select State / রাজ্য নির্বাচন করুন --</option>
+                  <option value="West Bengal">West Bengal (পশ্চিমবঙ্গ)</option>
+                  <option value="Assam">Assam (আসাম)</option>
+                  <option value="Bihar">Bihar (বিহার)</option>
+                  <option value="Jharkhand">Jharkhand (ঝাড়খণ্ড)</option>
+                  <option value="Odisha">Odisha (ওড়িশা)</option>
+                  <option value="Other">Other State (অন্যান্য)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>District <span>(জেলা - West Bengal)</span> *</label>
+                <select class="form-control z-ind-req" name="District">
+                  <option value="" disabled selected>-- Select District / জেলা নির্বাচন করুন --</option>
+                  <option value="Uttar Dinajpur">Uttar Dinajpur (উত্তর দিনাজপুর)</option>
+                  <option value="Dakshin Dinajpur">Dakshin Dinajpur (দক্ষিণ দিনাজপুর)</option>
+                  <option value="Malda">Malda (মালদা)</option>
+                  <option value="Darjeeling">Darjeeling (দার্জিলিং)</option>
+                  <option value="Jalpaiguri">Jalpaiguri (জলপাইগুড়ি)</option>
+                  <option value="Alipurduar">Alipurduar (আলipurদুয়ার)</option>
+                  <option value="Cooch Behar">Cooch Behar (কোচবিহার)</option>
+                  <option value="Kalimpong">Kalimpong (কালিম্পং)</option>
+                  <option value="Murshidabad">Murshidabad (মুর্শিদাবাদ)</option>
+                  <option value="Nadia">Nadia (নদিয়া)</option>
+                  <option value="Birbhum">Birbhum (বীরভূম)</option>
+                  <option value="Bankura">Bankura (বাঁকুড়া)</option>
+                  <option value="Purulia">Purulia (পুরুলিয়া)</option>
+                  <option value="Paschim Bardhaman">Paschim Bardhaman (পশ্চিম বর্ধমান)</option>
+                  <option value="Purba Bardhaman">Purba Bardhaman (পূর্ব বর্ধমান)</option>
+                  <option value="Hooghly">Hooghly (হুগলি)</option>
+                  <option value="Howrah">Howrah (হাওড়া)</option>
+                  <option value="Kolkata">Kolkata (কলকাতা)</option>
+                  <option value="North 24 Parganas">North 24 Parganas (উত্তর ২৪ পরগনা)</option>
+                  <option value="South 24 Parganas">South 24 Parganas (দক্ষিণ ২৪ পরগনা)</option>
+                  <option value="Paschim Medinipur">Paschim Medinipur (পশ্চিম মেদিনীপুর)</option>
+                  <option value="Purba Medinipur">Purba Medinipur (পূর্ব মেদিনীপুর)</option>
+                  <option value="Jhargram">Jhargram (ঝাড়গ্রাম)</option>
+                  <option value="Other">Other District (অন্যান্য জেলা)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>City / Town / Block <span>(শহর / ব্লক)</span> *</label>
+                <input type="text" class="form-control z-ind-req" name="City" placeholder="e.g. Kaliyaganj" />
+              </div>
+              <div class="form-group">
+                <label>PIN Code <span>(পিন কোড)</span> *</label>
+                <input type="text" class="form-control z-ind-req" name="PIN_Code" placeholder="733129" maxlength="6" pattern="[0-9]{6}" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Student Class <span>(ছাত্র হলে কোন শ্রেণী)</span></label>
+                <input type="text" class="form-control" name="Student_Class" placeholder="e.g. Class 10 / 12 / Degree / NA" />
+              </div>
+              <div class="form-group">
+                <label>Profession / Occupation <span>(বর্তমান পেশা)</span></label>
+                <input type="text" class="form-control" name="Profession" placeholder="e.g. Student / Private Job / Business" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Prior Camp Experience <span>(পূর্বের শিবির অভিজ্ঞতা)</span></label>
+              <select class="form-control" name="Prior_Experience">
+                <option value="No">No / First Time (না / প্রথমবার)</option>
+                <option value="Yes">Yes (হ্যাঁ)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="zonalGroupSection" style="display: none;">
+            <div id="zonalApplicantsContainer"></div>
+            <div class="add-more-container">
+              <button type="button" class="add-more-btn" onclick="addNewZonalApplicantCard()">
+                + Add More Applicant (আরও শিক্ষার্থী যোগ করুন)
+              </button>
+            </div>
+          </div>
+
+          <div class="official-declaration-box">
+            <div class="declaration-heading">
+              সম্পাদক, <br>
+              কালিয়াগঞ্জ বিবেকানন্দ যুব মহামন্ডল <br>
+              (অখিল ভারত বিবেকানন্দ যুব মহামন্ডলের ভাবাদর্শে পরিচালিত)
+            </div>
+            <p class="declaration-text">
+              <strong>মহাশয়,</strong> আমি / আমরা শিক্ষণ শিবিরের উদ্দেশ্য এবং যোগদানের নিয়মাবলী জেনেছি। আমি / আমরা উক্ত নিয়মাবলী মেনে চলবো। আমাকে / আমাদের, শিক্ষার্থী হিসেবে শিবিরে যোগদানের অনুমতি দিলে বাধিত হব।
+            </p>
+            <div class="form-check">
+              <input type="checkbox" id="zonalRulesAgree" required />
+              <label for="zonalRulesAgree">
+                আমি অঙ্গীকার করছি যে উল্লেখিত বিবরণ সঠিক এবং আমি শিবিরের নিয়মাবলী মেনে চলব (I declare and accept all rules) *
+              </label>
+            </div>
+          </div>
+
+          <div class="signature-card-box">
+            <div class="date-meta">
+              <strong>তারিখ (Date):</strong> <span class="currentFormDateDisplay"></span><br>
+              <small style="color: #64748b;">Kaliyaganj Centre Unit</small>
+            </div>
+            <div class="sign-meta-block">
+              <div class="sign-image-wrapper">
+                <img src="sign.jpeg" alt="Authorized Signature" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                <span style="display:none; font-family: 'Brush Script MT', cursive; font-size: 24px; color: #0b1a62;">Sudipta Sarkar</span>
+              </div>
+              <div class="sign-caption">আবেদনকারী / অনুমোদিত স্বাক্ষর</div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">Submit Zonal Application (আবেদন জমা দিন)</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 3. ANNUAL CAMP FORM MODAL ==================== -->
+  <div class="modal-overlay" id="annualFormModal">
+    <div class="modal-container">
+      <div class="modal-header annual-header">
+        <h3>
+          ANNUAL ALL INDIA YOUTH TRAINING CAMP APPLICATION
+          <span>সর্বভারতীয় বার্ষিক যুব প্রশিক্ষণ শিবির আবেদন পত্র</span>
+        </h3>
+        <button class="close-modal-btn" onclick="closeAnnualForm()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="camp-rules-box annual-rules">
+          <h4>নিয়মাবলী ও নির্দেশিকা (Annual Camp Rules & Guidelines)</h4>
+          <ol>
+            <li>শিবিরে কেবলমাত্র পুরুষরাই যোগদান করতে পারবেন। কমপক্ষে দশম শ্রেণীর ছাত্র বা ১৬ বৎসরের ঊর্ধ্বে আগ্রহী যে কোন ব্যক্তি শিবিরে যোগ দিতে পারবেন।</li>
+            <li>ব্যক্তি বা প্রতিষ্ঠান শিক্ষার্থী সম্পর্কিত তথ্যাদি জানিয়ে শিবিরে যোগদানের জন্য আবেদন করতে পারবেন।</li>
+            <li>অনলাইনে বা কেন্দ্রীয় ও শাখা কার্যালয়ে আবেদনপত্র জমা দিতে হবে।</li>
+            <li>শিবিরে পৌঁছে শিক্ষার্থীকে ২৫০ টাকা (অনুপার্জনশীল ব্যক্তিদের ক্ষেত্রে) / সামর্থ্য অনুসারে ৩৫০ টাকা বা ১০০০ টাকা (উপার্জনশীল ব্যক্তিদের ক্ষেত্রে) জমা দিতে হবে।</li>
+            <li>থাকা-খাওয়ার জন্য অতিরিক্ত কোন অর্থ দিতে হবে না। যাতায়াতের ব্যয় শিক্ষার্থীকে বহন করতে হবে।</li>
+            <li>হালকা বিছানা, মশারি, খাওয়ার থালা, গ্লাস ও অন্যান্য নিজস্ব ব্যবহার্য জিনিস সঙ্গে আনতে হবে।</li>
+            <li>সম্ভব হলে প্যারেড ও শরীরচর্চার জন্য সাদা পোশাক ও কেডস আনতে পারেন।</li>
+            <li>শিক্ষার্থীকে প্রত্যেক অনুষ্ঠানে অবশ্যই অংশগ্রহণ করতে হবে এবং ক্লাসের নোট নেওয়া বাঞ্ছনীয়।</li>
+            <li>শিবির শিক্ষার্থীদের মোবাইল ফোন ব্যবহার নিষিদ্ধ। বিশেষ প্রয়োজনে বাড়িতে যোগাযোগের ব্যবস্থা থাকবে।</li>
+            <li><strong>পরিচয়পত্র ও ছবি:</strong> আবেদনপত্রের সাথে বৈধ পরিচয়পত্র (Identity Card) ও সাম্প্রতিক পাসপোর্ট সাইজ ছবি আপলোড করা আবশ্যক।</li>
+          </ol>
+          <div class="camp-notice-timing">
+            * কেন্দ্রীয় কার্যালয়: ৬/১এ, জাস্টিস মন্মথ মুখার্জী রোড, কলকাতা - ৭০০০০৯<br>
+            * স্থানীয় কার্যালয়: কালিয়াগঞ্জ অনুমোদন প্রাপ্ত শাখা কলেজ পাড়া, উত্তর দিনাজপুর, ৭৩৩১২৯
+          </div>
+        </div>
+
+        <form id="annualRegistrationForm" action="https://formspree.io/f/xkjjbylo" method="POST" onsubmit="handleUniversalSubmit(event, 'Annual')">
+          <input type="hidden" name="Camp_Type" value="Annual All India Camp" />
+          
+          <div class="form-group">
+            <label>Participation Type <span>(আবেদনের ধরন)</span> *</label>
+            <select class="form-control" name="Participation_Type" id="annualPartSelect" onchange="toggleAnnualMode(this.value)" required>
+              <option value="" disabled selected>-- Select Participation Type / নির্বাচন করুন --</option>
+              <option value="Individual">Individual (ব্যক্তিগতভাবে)</option>
+              <option value="Institution">Through Institution / Group (প্রতিষ্ঠানের মাধ্যমে)</option>
+            </select>
+          </div>
+
+          <div id="annualInstitutionBlock" style="display: none;">
+            <div class="form-group">
+              <label>Institution / School / College Name <span>(শিক্ষা প্রতিষ্ঠান বা সংস্থার নাম)</span> *</label>
+              <input type="text" class="form-control" name="Institution_Name" id="annualInstName" placeholder="Enter school / college / organization name" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Institution In-charge / Head <span>(দায়িত্বপ্রাপ্ত ব্যক্তি / প্রধান)</span> *</label>
+                <input type="text" class="form-control" name="Institution_Contact_Person" id="annualInstContact" placeholder="Name of Teacher / Head" />
+              </div>
+              <div class="form-group">
+                <label>Institution Phone No <span>(যোগাযোগের নম্বর)</span> *</label>
+                <input type="tel" class="form-control" name="Institution_Phone" id="annualInstPhone" placeholder="+91 XXXXXXXXXX" />
+              </div>
+            </div>
+          </div>
+
+          <div id="annualIndividualSection" style="display: none;">
+            <div class="form-group">
+              <label>Applicant Full Name <span>(শিক্ষার্থীর পুরো নাম)</span> *</label>
+              <input type="text" class="form-control a-ind-req" name="Applicant_Name" placeholder="Enter full name" />
+            </div>
+
+            <div class="form-group">
+              <label>Father's Name <span>(পিতার নাম)</span> *</label>
+              <input type="text" class="form-control a-ind-req" name="Father_Name" placeholder="Enter father's name" />
+            </div>
+
+            <div class="form-group">
+              <label>Mother's Name <span>(মাতার নাম)</span></label>
+              <input type="text" class="form-control a-ind-req" name="Mother_Name" placeholder="Enter mother's name" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Phone / WhatsApp No <span>(ফোন নং)</span> *</label>
+                <input type="tel" class="form-control a-ind-req" name="Phone_Number" placeholder="+91 XXXXXXXXXX" />
+              </div>
+              <div class="form-group">
+                <label>Date of Birth <span>(জন্ম তারিখ)</span> *</label>
+                <input type="date" class="form-control a-ind-req" name="Date_Of_Birth" onchange="calculateSingleAge(this.value, 'ageDisplayAnnualInd', 16)" />
+                <span id="ageDisplayAnnualInd" class="age-preview"></span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>ID Card Type <span>(পরিচয়পত্রের ধরন)</span> *</label>
+                <select class="form-control a-ind-req" name="ID_Card_Type">
+                  <option value="" disabled selected>-- Select ID Card Type / নির্বাচন করুন --</option>
+                  <option value="Aadhaar Card">Aadhaar Card (আধার কার্ড)</option>
+                  <option value="Voter ID Card">Voter ID Card (ভোটার কার্ড)</option>
+                  <option value="Other Govt ID">Other Govt ID (অন্যান্য সরকারি পরিচয়পত্র)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ID Document Number <span>(পরিচয়পত্র নম্বর)</span> *</label>
+                <input type="text" class="form-control a-ind-req" name="ID_Card_Number" placeholder="Enter selected ID number" />
+              </div>
+            </div>
+
+            <!-- Upload Inputs: Photo & ID Document -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Passport Size Photo <span>(পাসপোর্ট সাইজ ছবি)</span> *</label>
+                <div class="upload-field-box">
+                  <input type="file" class="form-control a-ind-req" name="Applicant_Photo" accept="image/jpeg,image/png,image/jpg" />
+                  <span class="upload-note">Format: JPG, JPEG, PNG</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Upload ID Card Proof <span>(পরিচয়পত্রের কপি)</span> *</label>
+                <div class="upload-field-box">
+                  <input type="file" class="form-control a-ind-req" name="Applicant_ID_Doc" accept="image/*,application/pdf" />
+                  <span class="upload-note">Format: PDF, JPG, PNG</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Street / Village Address <span>(রাস্তা / গ্রাম / পাড়া)</span> *</label>
+              <input type="text" class="form-control a-ind-req" name="Street_Address" placeholder="Enter house no, street or village" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>State <span>(রাজ্য)</span> *</label>
+                <select class="form-control a-ind-req" name="State">
+                  <option value="" disabled selected>-- Select State / রাজ্য নির্বাচন করুন --</option>
+                  <option value="West Bengal">West Bengal (পশ্চিমবঙ্গ)</option>
+                  <option value="Assam">Assam (আসাম)</option>
+                  <option value="Bihar">Bihar (বিহার)</option>
+                  <option value="Jharkhand">Jharkhand (ঝাড়খণ্ড)</option>
+                  <option value="Odisha">Odisha (ওড়িশা)</option>
+                  <option value="Tripura">Tripura (ত্রিপুরা)</option>
+                  <option value="Other">Other State (অন্যান্য রাজ্য)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>District <span>(জেলা - West Bengal)</span> *</label>
+                <select class="form-control a-ind-req" name="District">
+                  <option value="" disabled selected>-- Select District / জেলা নির্বাচন করুন --</option>
+                  <option value="Uttar Dinajpur">Uttar Dinajpur (উত্তর দিনাজপুর)</option>
+                  <option value="Dakshin Dinajpur">Dakshin Dinajpur (দক্ষিণ দিনাজপুর)</option>
+                  <option value="Malda">Malda (মালদা)</option>
+                  <option value="Darjeeling">Darjeeling (দার্জিলিং)</option>
+                  <option value="Jalpaiguri">Jalpaiguri (জলপাইগুড়ি)</option>
+                  <option value="Alipurduar">Alipurduar (আলipurদুয়ার)</option>
+                  <option value="Cooch Behar">Cooch Behar (কোচবিহার)</option>
+                  <option value="Kalimpong">Kalimpong (কালিম্পং)</option>
+                  <option value="Murshidabad">Murshidabad (মুর্শিদাবাদ)</option>
+                  <option value="Nadia">Nadia (নদিয়া)</option>
+                  <option value="Birbhum">Birbhum (বীরভূম)</option>
+                  <option value="Bankura">Bankura (বাঁকুড়া)</option>
+                  <option value="Purulia">Purulia (পুরুলিয়া)</option>
+                  <option value="Paschim Bardhaman">Paschim Bardhaman (পশ্চিম বর্ধমান)</option>
+                  <option value="Purba Bardhaman">Purba Bardhaman (পূর্ব বর্ধমান)</option>
+                  <option value="Hooghly">Hooghly (হুগলি)</option>
+                  <option value="Howrah">Howrah (হাওড়া)</option>
+                  <option value="Kolkata">Kolkata (কলকাতা)</option>
+                  <option value="North 24 Parganas">North 24 Parganas (উত্তর ২৪ পরগনা)</option>
+                  <option value="South 24 Parganas">South 24 Parganas (দক্ষিণ ২৪ পরগনা)</option>
+                  <option value="Paschim Medinipur">Paschim Medinipur (পশ্চিম মেদিনীপুর)</option>
+                  <option value="Purba Medinipur">Purba Medinipur (পূর্ব মেদিনীপুর)</option>
+                  <option value="Jhargram">Jhargram (ঝাড়গ্রাম)</option>
+                  <option value="Other">Other District (অন্যান্য জেলা)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>City / Town / Block <span>(শহর / ব্লক)</span> *</label>
+                <input type="text" class="form-control a-ind-req" name="City" placeholder="e.g. Kaliyaganj" />
+              </div>
+              <div class="form-group">
+                <label>PIN Code <span>(পিন কোড)</span> *</label>
+                <input type="text" class="form-control a-ind-req" name="PIN_Code" placeholder="733129" maxlength="6" pattern="[0-9]{6}" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Student Class <span>(ছাত্র হলে কোন শ্রেণী)</span></label>
+                <input type="text" class="form-control" name="Student_Class" placeholder="e.g. Class 10 / 12 / Degree / NA" />
+              </div>
+              <div class="form-group">
+                <label>Profession / Occupation <span>(বর্তমান পেশা)</span></label>
+                <input type="text" class="form-control" name="Profession" placeholder="e.g. Student / Private Job / Business" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Prior Camp Experience <span>(পূর্বের শিবির অভিজ্ঞতা)</span></label>
+              <select class="form-control" name="Prior_Experience">
+                <option value="No">No / First Time (না / প্রথমবার)</option>
+                <option value="Yes">Yes (হ্যাঁ)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="annualGroupSection" style="display: none;">
+            <div id="annualApplicantsContainer"></div>
+            <div class="add-more-container">
+              <button type="button" class="add-more-btn" onclick="addNewAnnualApplicantCard()">
+                + Add More Applicant (আরও শিক্ষার্থী যোগ করুন)
+              </button>
+            </div>
+          </div>
+
+          <div class="official-declaration-box">
+            <div class="declaration-heading">
+              সম্পাদক, <br>
+              সর্বভারতীয় বার্ষিক যুব প্রশিক্ষণ শিবির কমিটি <br>
+              অখিল ভারত বিবেকানন্দ যুব মহামণ্ডল
+            </div>
+            <p class="declaration-text">
+              <strong>মহাশয়,</strong> আমি / আমরা সর্বভারতীয় বার্ষিক যুব প্রশিক্ষণ শিবিরের উদ্দেশ্য এবং যোগদানের নিয়মাবলী জেনেছি। আমি / আমরা উক্ত নিয়মাবলী মেনে চলবো। আমাকে / আমাদের শিক্ষার্থী হিসেবে শিবিরে যোগদানের অনুমতি দিলে বাধিত হব।
+            </p>
+            <div class="form-check">
+              <input type="checkbox" id="annualRulesAgree" required />
+              <label for="annualRulesAgree">
+                আমি অঙ্গীকার করছি যে প্রদত্ত সমস্ত বিবরণ ও নথিপত্র সঠিক এবং আমি শিবিরের নিয়মাবলী মেনে চলব *
+              </label>
+            </div>
+          </div>
+
+          <div class="signature-card-box">
+            <div class="date-meta">
+              <strong>তারিখ (Date):</strong> <span class="currentFormDateDisplay"></span><br>
+              <small style="color: #64748b;">All India Youth Camp Wing</small>
+            </div>
+            <div class="sign-meta-block">
+              <div class="sign-image-wrapper">
+                <img src="sign.jpeg" alt="Authorized Signature" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                <span style="display:none; font-family: 'Brush Script MT', cursive; font-size: 24px; color: #0b1a62;">Sudipta Sarkar</span>
+              </div>
+              <div class="sign-caption">আবেদনকারী / অনুমোদিত স্বাক্ষর</div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn annual-btn">Submit Annual Application (আবেদন জমা দিন)</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== UNIVERSAL THANK YOU POPUP MODAL ==================== -->
+  <div class="thankyou-modal-overlay" id="thankyouModal">
+    <div class="thankyou-card">
+      <div class="thankyou-icon">&#10004;</div>
+      <h3 class="thankyou-title">Thank You!</h3>
+      <div class="thankyou-bengali-title">আবেদনপত্র সফলভাবে গৃহীত হয়েছে!</div>
+      <p class="thankyou-desc" id="thankyouCustomDesc">
+        Your registration details for the Youth Training Camp have been submitted successfully.
+      </p>
+      <button type="button" class="thankyou-close-btn" onclick="closeThankYouModal()">Close / বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <script>
+    // ---------------- FIREBASE INITIALIZATION ----------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1RD2KA-abi6-9rdHzGW4QOS6TEqequeg",
+      authDomain: "abvym-bd6d5.firebaseapp.com",
+      projectId: "abvym-bd6d5",
+      storageBucket: "abvym-bd6d5.firebasestorage.app",
+      messagingSenderId: "371731986972",
+      appId: "1:371731986972:web:bdb9374706cd0fbf16fdd9",
+      measurementId: "G-56XCC5VDSN"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ---------------- CLOUDINARY CONFIG ----------------
+    const CLOUD_NAME = "iwvdadjh";
+    const UPLOAD_PRESET = "camp_preset";
+
+    // Client-side lightweight image compressor
+    function compressImageFile(file, maxDimension = 800, quality = 0.70) {
+      return new Promise((resolve) => {
+        if (!file || !file.type.startsWith('image/')) {
+          resolve(file);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height && width > maxDimension) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else if (height > maxDimension) {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+                  type: 'image/jpeg',
+                  lastModified: Date.now()
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            }, 'image/jpeg', quality);
+          };
+          img.onerror = () => resolve(file);
+        };
+        reader.onerror = () => resolve(file);
+      });
+    }
+
+    // Direct Cloudinary Upload Helper
+    async function uploadToCloudinary(file) {
+      const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', UPLOAD_PRESET);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          body: fd,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          throw new Error(errData.error?.message || resp.statusText);
+        }
+        const data = await resp.json();
+        return data.secure_url;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    }
+
+    const halfDayModal = document.getElementById('halfDayFormModal');
+    const oneDayModal = document.getElementById('oneDayFormModal');
+    const zonalModal = document.getElementById('zonalFormModal');
+    const annualModal = document.getElementById('annualFormModal');
+    const thankyouModal = document.getElementById('thankyouModal');
+    const inactiveNoticeModal = document.getElementById('inactiveNoticeModal');
+
+    let halfDayApplicantCount = 0;
+    let oneDayApplicantCount = 0;
+    let zonalApplicantCount = 0;
+    let annualApplicantCount = 0;
+
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    document.querySelectorAll('.currentFormDateDisplay').forEach(el => el.textContent = formattedDate);
+
+    // ---------------- SPECIFIC CAMP DETAILS IN BENGALI ----------------
+    const campInfoDetails = {
+      'Half Day Camp': {
+        enTitle: 'Half Day Youth Training Camp',
+        bnTitle: 'অর্ধদিবসীয় যুব প্রশিক্ষণ শিবির',
+        desc: '<strong>অর্ধদিবসীয় যুব প্রশিক্ষণ শিবির কী?</strong><br>এটি মূলত স্কুল, কলেজ ও শাখা স্তরের নবীন শিক্ষার্থীদের জন্য ২-৩ ঘণ্টার একটি প্রারম্ভিক ব্যক্তিত্ব ও চরিত্র গঠনমূলক অধিবেশন। এতে একাগ্রতা বৃদ্ধির উপায়, যোগব্যায়াম, অনুপ্রেরণামূলক যুব আলোচনা ও শৃঙ্খলা গঠনের দিকনির্দেশ প্রদান করা হয়।<br><br><em>(নির্দিষ্ট তারিখ ও অনলাইন আসন সংরক্ষণ প্রক্রিয়া শীঘ্রই শুরু হবে।)</em>'
+      },
+      'One Day Camp': {
+        enTitle: 'One Day Youth Training Camp',
+        bnTitle: 'একদিবসীয় যুব প্রশিক্ষণ শিবির',
+        desc: '<strong>একদিবসীয় যুব প্রশিক্ষণ শিবির কী?</strong><br>এটি মূলত স্থানীয় শাখা ও ইউনিট স্তরে আয়োজিত দিনব্যাপী একটি নিবিড় চরিত্র গঠনমূলক শিবির। এই শিবিরে শিক্ষার্থী ও যুবকদের শারীরিক ও মানসিক একাগ্রতা বৃদ্ধির জন্য যোগাসন, শরীরচর্চা, পাঠচক্র এবং স্বামী বিবেকানন্দের মানুষ গড়ার আদর্শ ভিত্তিক যুব আলোচনা ও প্রশ্নোত্তর পর্ব পরিচালিত হয়।<br><br><em>(নিয়মাবলী, নির্দিষ্ট তারিখ ও আবেদন শুরুর সময়সূচি শীঘ্রই প্রকাশিত হবে।)</em>'
+      },
+      'Zonal Camp': {
+        enTitle: 'Zonal Youth Training Camp',
+        bnTitle: 'আঞ্চলিক যুব প্রশিক্ষণ শিবির',
+        desc: '<strong>আঞ্চলিক যুব প্রশিক্ষণ শিবির কী?</strong><br>এটি পার্শ্ববর্তী একাধিক শাখা ও অঞ্চলকে একত্রিত করে পরিচালিত ২-৩ দিনের একটি সুশৃঙ্খল আবাসিক শিবির। এর মূল উদ্দেশ্য যুবকদের মধ্যে দলগত নেতৃত্ব, শৃঙ্খলাবোধ, সেবাধর্মী মনোভাব এবং প্যারেড ও শরীরচর্চার মাধ্যমে চরিত্রবান কর্মী হিসেবে গড়ে তোলা।<br><br><em>(আঞ্চলিক শিবিরের স্থান, তারিখ ও রেজিস্ট্রেশন নির্ঘণ্ট শীঘ্রই বিজ্ঞপ্তির মাধ্যমে জানানো হবে।)</em>'
+      },
+      'Annual Camp': {
+        enTitle: 'Annual All India Youth Training Camp',
+        bnTitle: 'সর্বভারতীয় বার্ষিক যুব প্রশিক্ষণ শিবির',
+        desc: '<strong>সর্বভারতীয় বার্ষিক যুব প্রশিক্ষণ শিবির কী?</strong><br>এটি অখিল ভারত বিবেকানন্দ যুব মহামণ্ডলের কেন্দ্রীয় কমিটির তত্ত্বাবধানে আয়োজিত জাতীয় স্তরের প্রধান আবাসিক সম্মেলন। প্রতি বছর ডিসেম্বর মাসের শেষ সপ্তাহে সমগ্র ভারতের বিভিন্ন প্রান্ত থেকে আগত যুব প্রতিনিধিরা এতে অংশগ্রহণ করেন। বিশিষ্ট বক্তাদের সান্ধ্য অধিবেশন, সাংস্কৃতিক অনুষ্ঠান, সংস্কৃত শ্লোক পাঠ ও চরিত্র গঠনের আদর্শ পাঠচক্র এই শিবিরের মূল বৈশিষ্ট্য।<br><br><em>(সর্বভারতীয় শিবিরের কেন্দ্রীয় বিজ্ঞপ্তি ও অনলাইন আসন সংরক্ষণ প্রক্রিয়া শীঘ্রই শুরু হবে।)</em>'
+      }
+    };
+
+    function showInactiveNotice(campKey) {
+      const info = campInfoDetails[campKey];
+      if (info && inactiveNoticeModal) {
+        const titleEl = document.getElementById('noticeCampTitle');
+        const bnTitleEl = document.getElementById('noticeCampBanglaTitle');
+        const aboutEl = document.getElementById('noticeCampAbout');
+        if (titleEl) titleEl.textContent = info.enTitle;
+        if (bnTitleEl) bnTitleEl.textContent = info.bnTitle;
+        if (aboutEl) aboutEl.innerHTML = info.desc;
+      }
+      if (inactiveNoticeModal) inactiveNoticeModal.style.display = 'flex';
+    }
+
+    function closeInactiveNotice() {
+      if (inactiveNoticeModal) inactiveNoticeModal.style.display = 'none';
+    }
+
+    function openHalfDayForm() { if (halfDayModal) halfDayModal.classList.add('active'); }
+    function closeHalfDayForm() { if (halfDayModal) halfDayModal.classList.remove('active'); }
+
+    function openOneDayForm() { if (oneDayModal) oneDayModal.classList.add('active'); }
+    function closeOneDayForm() { if (oneDayModal) oneDayModal.classList.remove('active'); }
+
+    function openZonalForm() { if (zonalModal) zonalModal.classList.add('active'); }
+    function closeZonalForm() { if (zonalModal) zonalModal.classList.remove('active'); }
+
+    function openAnnualForm() { if (annualModal) annualModal.classList.add('active'); }
+    function closeAnnualForm() { if (annualModal) annualModal.classList.remove('active'); }
+
+    function showThankYouModal(campName) {
+      const desc = document.getElementById('thankyouCustomDesc');
+      if (desc) {
+        desc.innerHTML = `<strong>${campName}</strong> শিবিরের জন্য আপনার আবেদন সফলভাবে গৃহীত হয়েছে!`;
+      }
+      if (thankyouModal) thankyouModal.classList.add('active');
+    }
+
+    function closeThankYouModal() {
+      if (thankyouModal) thankyouModal.classList.remove('active');
+    }
+
+    window.addEventListener('click', (e) => {
+      if (e.target === halfDayModal) closeHalfDayForm();
+      if (e.target === oneDayModal) closeOneDayForm();
+      if (e.target === zonalModal) closeZonalForm();
+      if (e.target === annualModal) closeAnnualForm();
+      if (e.target === thankyouModal) closeThankYouModal();
+      if (e.target === inactiveNoticeModal) closeInactiveNotice();
+    });
+
+    // ---------------- MODE TOGGLES ----------------
+    function toggleHalfDayMode(mode) {
+      const indSection = document.getElementById('halfDayIndividualSection');
+      const groupSection = document.getElementById('halfDayGroupSection');
+      const instBlock = document.getElementById('halfDayInstitutionBlock');
+      const indInputs = indSection.querySelectorAll('.h-ind-req');
+      const instName = document.getElementById('halfDayInstName');
+      const instPhone = document.getElementById('halfDayInstPhone');
+
+      if (mode === 'Institution') {
+        indSection.style.display = 'none';
+        groupSection.style.display = 'block';
+        instBlock.style.display = 'block';
+        indInputs.forEach(i => i.removeAttribute('required'));
+        instName.setAttribute('required', 'true');
+        instPhone.setAttribute('required', 'true');
+        if (document.querySelectorAll('#halfDayApplicantsContainer .applicant-entry-card').length === 0) {
+          addNewHalfDayApplicantCard();
+        }
+      } else if (mode === 'Individual') {
+        indSection.style.display = 'block';
+        groupSection.style.display = 'none';
+        instBlock.style.display = 'none';
+        indInputs.forEach(i => i.setAttribute('required', 'true'));
+        instName.removeAttribute('required');
+        instPhone.removeAttribute('required');
+      }
+    }
+
+    function toggleOneDayMode(mode) {
+      const indSection = document.getElementById('oneDayIndividualSection');
+      const groupSection = document.getElementById('oneDayGroupSection');
+      const instBlock = document.getElementById('oneDayInstitutionBlock');
+      const indInputs = indSection.querySelectorAll('.o-ind-req');
+      const instName = document.getElementById('oneDayInstName');
+      const instPhone = document.getElementById('oneDayInstPhone');
+
+      if (mode === 'Institution') {
+        indSection.style.display = 'none';
+        groupSection.style.display = 'block';
+        instBlock.style.display = 'block';
+        indInputs.forEach(i => i.removeAttribute('required'));
+        instName.setAttribute('required', 'true');
+        instPhone.setAttribute('required', 'true');
+        if (document.querySelectorAll('#oneDayApplicantsContainer .applicant-entry-card').length === 0) {
+          addNewOneDayApplicantCard();
+        }
+      } else if (mode === 'Individual') {
+        indSection.style.display = 'block';
+        groupSection.style.display = 'none';
+        instBlock.style.display = 'none';
+        indInputs.forEach(i => i.setAttribute('required', 'true'));
+        instName.removeAttribute('required');
+        instPhone.removeAttribute('required');
+      }
+    }
+
+    function toggleZonalMode(mode) {
+      const indSection = document.getElementById('zonalIndividualSection');
+      const groupSection = document.getElementById('zonalGroupSection');
+      const instBlock = document.getElementById('zonalInstitutionBlock');
+      const indInputs = indSection.querySelectorAll('.z-ind-req');
+      const instName = document.getElementById('zonalInstName');
+      const instPhone = document.getElementById('zonalInstPhone');
+
+      if (mode === 'Institution') {
+        indSection.style.display = 'none';
+        groupSection.style.display = 'block';
+        instBlock.style.display = 'block';
+        indInputs.forEach(i => i.removeAttribute('required'));
+        instName.setAttribute('required', 'true');
+        instPhone.setAttribute('required', 'true');
+        if (document.querySelectorAll('#zonalApplicantsContainer .applicant-entry-card').length === 0) {
+          addNewZonalApplicantCard();
+        }
+      } else if (mode === 'Individual') {
+        indSection.style.display = 'block';
+        groupSection.style.display = 'none';
+        instBlock.style.display = 'none';
+        indInputs.forEach(i => i.setAttribute('required', 'true'));
+        instName.removeAttribute('required');
+        instPhone.removeAttribute('required');
+      }
+    }
+
+    function toggleAnnualMode(mode) {
+      const indSection = document.getElementById('annualIndividualSection');
+      const groupSection = document.getElementById('annualGroupSection');
+      const instBlock = document.getElementById('annualInstitutionBlock');
+      const indInputs = indSection.querySelectorAll('.a-ind-req');
+      const instName = document.getElementById('annualInstName');
+      const instPhone = document.getElementById('annualInstPhone');
+
+      if (mode === 'Institution') {
+        indSection.style.display = 'none';
+        groupSection.style.display = 'block';
+        instBlock.style.display = 'block';
+        indInputs.forEach(i => i.removeAttribute('required'));
+        instName.setAttribute('required', 'true');
+        instPhone.setAttribute('required', 'true');
+        if (document.querySelectorAll('#annualApplicantsContainer .applicant-entry-card').length === 0) {
+          addNewAnnualApplicantCard();
+        }
+      } else if (mode === 'Individual') {
+        indSection.style.display = 'block';
+        groupSection.style.display = 'none';
+        instBlock.style.display = 'none';
+        indInputs.forEach(i => i.setAttribute('required', 'true'));
+        instName.removeAttribute('required');
+        instPhone.removeAttribute('required');
+      }
+    }
+
+    // ---------------- DYNAMIC APPLICANT CARDS ----------------
+    function addNewHalfDayApplicantCard() {
+      halfDayApplicantCount++;
+      const container = document.getElementById('halfDayApplicantsContainer');
+      const card = document.createElement('div');
+      card.className = 'applicant-entry-card';
+      card.id = `h_card_${halfDayApplicantCount}`;
+
+      card.innerHTML = `
+        <div class="applicant-card-header">
+          <div class="applicant-card-title">Applicant #${halfDayApplicantCount}</div>
+          ${halfDayApplicantCount > 1 ? `<button type="button" class="remove-applicant-btn" onclick="removeCard('h_card_${halfDayApplicantCount}')">&times; Remove</button>` : ''}
+        </div>
+        <div class="form-group">
+          <label>Applicant Full Name *</label>
+          <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Name" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Father's Name *</label>
+            <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Father" required />
+          </div>
+          <div class="form-group">
+            <label>Mother's Name</label>
+            <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Mother" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone No *</label>
+            <input type="tel" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Phone" required />
+          </div>
+          <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_DOB" onchange="calculateSingleAge(this.value, 'h_age_${halfDayApplicantCount}', 14)" required />
+            <span id="h_age_${halfDayApplicantCount}" class="age-preview"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Full Address *</label>
+          <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Address" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>District *</label>
+            <select class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_District" required>
+              <option value="" disabled selected>-- Select District --</option>
+              <option value="Uttar Dinajpur">Uttar Dinajpur</option>
+              <option value="Dakshin Dinajpur">Dakshin Dinajpur</option>
+              <option value="Malda">Malda</option>
+              <option value="Darjeeling">Darjeeling</option>
+              <option value="Other">Other District</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code *</label>
+            <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_PIN" maxlength="6" pattern="[0-9]{6}" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Student Class</label>
+            <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Class" />
+          </div>
+          <div class="form-group">
+            <label>Profession</label>
+            <input type="text" class="form-control" name="HalfDay_Applicant_${halfDayApplicantCount}_Profession" />
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addNewOneDayApplicantCard() {
+      oneDayApplicantCount++;
+      const container = document.getElementById('oneDayApplicantsContainer');
+      const card = document.createElement('div');
+      card.className = 'applicant-entry-card';
+      card.id = `o_card_${oneDayApplicantCount}`;
+
+      card.innerHTML = `
+        <div class="applicant-card-header">
+          <div class="applicant-card-title">Applicant #${oneDayApplicantCount}</div>
+          ${oneDayApplicantCount > 1 ? `<button type="button" class="remove-applicant-btn" onclick="removeCard('o_card_${oneDayApplicantCount}')">&times; Remove</button>` : ''}
+        </div>
+        <div class="form-group">
+          <label>Applicant Full Name *</label>
+          <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Name" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Father's Name *</label>
+            <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Father" required />
+          </div>
+          <div class="form-group">
+            <label>Mother's Name</label>
+            <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Mother" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone No *</label>
+            <input type="tel" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Phone" required />
+          </div>
+          <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_DOB" onchange="calculateSingleAge(this.value, 'o_age_${oneDayApplicantCount}', 15)" required />
+            <span id="o_age_${oneDayApplicantCount}" class="age-preview"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Full Address *</label>
+          <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Address" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>District *</label>
+            <select class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_District" required>
+              <option value="" disabled selected>-- Select District --</option>
+              <option value="Uttar Dinajpur">Uttar Dinajpur</option>
+              <option value="Dakshin Dinajpur">Dakshin Dinajpur</option>
+              <option value="Malda">Malda</option>
+              <option value="Darjeeling">Darjeeling</option>
+              <option value="Other">Other District</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code *</label>
+            <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_PIN" maxlength="6" pattern="[0-9]{6}" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Student Class</label>
+            <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Class" />
+          </div>
+          <div class="form-group">
+            <label>Profession</label>
+            <input type="text" class="form-control" name="OneDay_Applicant_${oneDayApplicantCount}_Profession" />
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addNewZonalApplicantCard() {
+      zonalApplicantCount++;
+      const container = document.getElementById('zonalApplicantsContainer');
+      const card = document.createElement('div');
+      card.className = 'applicant-entry-card';
+      card.id = `z_card_${zonalApplicantCount}`;
+
+      card.innerHTML = `
+        <div class="applicant-card-header">
+          <div class="applicant-card-title">Applicant #${zonalApplicantCount}</div>
+          ${zonalApplicantCount > 1 ? `<button type="button" class="remove-applicant-btn" onclick="removeCard('z_card_${zonalApplicantCount}')">&times; Remove</button>` : ''}
+        </div>
+        <div class="form-group">
+          <label>Applicant Full Name *</label>
+          <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Name" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Father's Name *</label>
+            <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Father" required />
+          </div>
+          <div class="form-group">
+            <label>Mother's Name</label>
+            <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Mother" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone No *</label>
+            <input type="tel" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Phone" required />
+          </div>
+          <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_DOB" onchange="calculateSingleAge(this.value, 'z_age_${zonalApplicantCount}', 16)" required />
+            <span id="z_age_${zonalApplicantCount}" class="age-preview"></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Full Address *</label>
+          <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Address" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>District *</label>
+            <select class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_District" required>
+              <option value="" disabled selected>-- Select District --</option>
+              <option value="Uttar Dinajpur">Uttar Dinajpur</option>
+              <option value="Dakshin Dinajpur">Dakshin Dinajpur</option>
+              <option value="Malda">Malda</option>
+              <option value="Darjeeling">Darjeeling</option>
+              <option value="Other">Other District</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code *</label>
+            <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_PIN" maxlength="6" pattern="[0-9]{6}" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Student Class</label>
+            <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Class" />
+          </div>
+          <div class="form-group">
+            <label>Profession</label>
+            <input type="text" class="form-control" name="Zonal_Applicant_${zonalApplicantCount}_Profession" />
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addNewAnnualApplicantCard() {
+      annualApplicantCount++;
+      const container = document.getElementById('annualApplicantsContainer');
+      const card = document.createElement('div');
+      card.className = 'applicant-entry-card';
+      card.id = `a_card_${annualApplicantCount}`;
+
+      card.innerHTML = `
+        <div class="applicant-card-header">
+          <div class="applicant-card-title">Applicant #${annualApplicantCount}</div>
+          ${annualApplicantCount > 1 ? `<button type="button" class="remove-applicant-btn" onclick="removeCard('a_card_${annualApplicantCount}')">&times; Remove</button>` : ''}
+        </div>
+        <div class="form-group">
+          <label>Applicant Full Name *</label>
+          <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Name" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Father's Name *</label>
+            <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Father" required />
+          </div>
+          <div class="form-group">
+            <label>Mother's Name</label>
+            <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Mother" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone No *</label>
+            <input type="tel" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Phone" required />
+          </div>
+          <div class="form-group">
+            <label>Date of Birth *</label>
+            <input type="date" class="form-control" name="Annual_Applicant_${annualApplicantCount}_DOB" onchange="calculateSingleAge(this.value, 'a_age_${annualApplicantCount}', 16)" required />
+            <span id="a_age_${annualApplicantCount}" class="age-preview"></span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>ID Card Type *</label>
+            <select class="form-control" name="Annual_Applicant_${annualApplicantCount}_IDType" required>
+              <option value="" disabled selected>-- Select ID Card Type --</option>
+              <option value="Aadhaar Card">Aadhaar Card</option>
+              <option value="Voter ID Card">Voter ID Card</option>
+              <option value="Other Govt ID">Other Govt ID</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ID Document Number *</label>
+            <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_IDNum" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Passport Size Photo *</label>
+            <div class="upload-field-box">
+              <input type="file" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Photo" accept="image/jpeg,image/png,image/jpg" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Upload ID Card Proof *</label>
+            <div class="upload-field-box">
+              <input type="file" class="form-control" name="Annual_Applicant_${annualApplicantCount}_IDDoc" accept="image/*,application/pdf" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Full Address *</label>
+          <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Address" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>District *</label>
+            <select class="form-control" name="Annual_Applicant_${annualApplicantCount}_District" required>
+              <option value="" disabled selected>-- Select District --</option>
+              <option value="Uttar Dinajpur">Uttar Dinajpur</option>
+              <option value="Dakshin Dinajpur">Dakshin Dinajpur</option>
+              <option value="Malda">Malda</option>
+              <option value="Darjeeling">Darjeeling</option>
+              <option value="Other">Other District</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>PIN Code *</label>
+            <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_PIN" maxlength="6" pattern="[0-9]{6}" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Student Class</label>
+            <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Class" />
+          </div>
+          <div class="form-group">
+            <label>Profession</label>
+            <input type="text" class="form-control" name="Annual_Applicant_${annualApplicantCount}_Profession" />
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function removeCard(cardId) {
+      const card = document.getElementById(cardId);
+      if (card) card.remove();
+    }
+
+    function calculateSingleAge(dobValue, displayId, minAge = 15) {
+      if (!dobValue) return;
+      const dob = new Date(dobValue);
+      const curr = new Date();
+      let age = curr.getFullYear() - dob.getFullYear();
+      const monthDiff = curr.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && curr.getDate() < dob.getDate())) {
+        age--;
+      }
+      const el = document.getElementById(displayId);
+      if (el) {
+        if (age < minAge) {
+          el.style.color = '#dc2626';
+          el.textContent = `Age: ${age} (At least ${minAge} required)`;
+        } else {
+          el.style.color = '#15803d';
+          el.textContent = `Age: ${age} (Eligible)`;
+        }
+      }
+    }
+
+    // ---------------- UNIVERSAL FAST SUBMIT ----------------
+    async function handleUniversalSubmit(e, campName) {
+      e.preventDefault();
+      const form = e.target;
+      const submitBtn = form.querySelector('.submit-btn');
+      const originalBtnText = submitBtn.textContent;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Compressing & Uploading files...';
+
+      try {
+        const formData = new FormData(form);
+        const cleanData = {};
+        const uploadTasks = [];
+
+        for (const [key, value] of formData.entries()) {
+          if (value instanceof File && value.size > 0) {
+            const task = (async () => {
+              try {
+                const compressedFile = await compressImageFile(value);
+                const uploadedUrl = await uploadToCloudinary(compressedFile);
+                cleanData[key] = uploadedUrl;
+              } catch (upErr) {
+                console.error("Cloudinary upload failed for " + key, upErr);
+                cleanData[key] = "Upload Failed";
+              }
+            })();
+            uploadTasks.push(task);
+          } else if (value instanceof File) {
+            cleanData[key] = "Not Uploaded";
+          } else {
+            cleanData[key] = value;
+          }
+        }
+
+        if (uploadTasks.length > 0) {
+          await Promise.all(uploadTasks);
+        }
+
+        submitBtn.textContent = 'Saving details...';
+
+        cleanData.Camp_Type = campName + ' Camp';
+        cleanData.Date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        cleanData.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
+
+        // 1. Direct Firebase Firestore Write
+        await db.collection("camp_registrations").add(cleanData);
+
+        // 2. Local Storage Backup
+        try {
+          const localList = JSON.parse(localStorage.getItem('offline_camp_records') || '[]');
+          localList.push(cleanData);
+          localStorage.setItem('offline_camp_records', JSON.stringify(localList));
+        } catch (locErr) {
+          console.warn("Local storage fallback warning:", locErr);
+        }
+
+        // 3. Formspree Email Trigger (Background)
+        try {
+          fetch(form.action, {
+            method: 'POST',
+            body: JSON.stringify(cleanData),
+            headers: { 
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          }).catch(err => console.warn("Email alert skipped:", err));
+        } catch (mailErr) {
+          console.warn("Mail trigger skipped:", mailErr);
+        }
+
+        form.reset();
+        if (campName === 'Half Day') closeHalfDayForm();
+        if (campName === 'One Day') closeOneDayForm();
+        if (campName === 'Zonal') closeZonalForm();
+        if (campName === 'Annual') closeAnnualForm();
+        showThankYouModal(campName);
+
+      } catch (globalErr) {
+        console.error("Submission failed:", globalErr);
+        alert("Submission Error: " + (globalErr.message || "Please check your network and try again."));
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+      }
+    }
+
+    // ---------------- REALTIME STATUS CONTROLS ----------------
+    let liveControls = {
+      halfDay: false,
+      oneDay: false,
+      zonal: false,
+      annual: false
+    };
+
+    db.collection("settings").doc("camp_controls").onSnapshot(doc => {
+      if (doc.exists) {
+        liveControls = doc.data();
+      }
+      updateClientUI();
+    });
+
+    function updateClientUI() {
+      // 1. Half Day
+      const badgeHalfDay = document.getElementById('badgeHalfDay');
+      const noticeHalfDay = document.getElementById('noticeHalfDay');
+      if (badgeHalfDay && noticeHalfDay) {
+        if (liveControls.halfDay) {
+          badgeHalfDay.textContent = 'REGISTRATION OPEN';
+          badgeHalfDay.style.background = '#dcfce7';
+          badgeHalfDay.style.color = '#15803d';
+          badgeHalfDay.style.borderColor = '#86efac';
+          noticeHalfDay.textContent = '✍ Click to Fill Form (আবেদন পত্র পূরণ করুন) →';
+          noticeHalfDay.style.color = '#15803d';
+        } else {
+          badgeHalfDay.textContent = 'Upcoming / শীঘ্রই আসছে';
+          badgeHalfDay.style.background = '#fef3c7';
+          badgeHalfDay.style.color = '#b45309';
+          badgeHalfDay.style.borderColor = '#fde68a';
+          noticeHalfDay.textContent = '⏳ Registration Closed (শীঘ্রই শুরু হবে) →';
+          noticeHalfDay.style.color = '#b45309';
+        }
+      }
+
+      // 2. One Day
+      const badgeOneDay = document.getElementById('badgeOneDay');
+      const noticeOneDay = document.getElementById('noticeOneDay');
+      if (badgeOneDay && noticeOneDay) {
+        if (liveControls.oneDay) {
+          badgeOneDay.textContent = 'REGISTRATION OPEN';
+          badgeOneDay.style.background = '#dcfce7';
+          badgeOneDay.style.color = '#15803d';
+          badgeOneDay.style.borderColor = '#86efac';
+          noticeOneDay.textContent = '✍ Click to Fill Form (আবেদন পত্র পূরণ করুন) →';
+          noticeOneDay.style.color = '#15803d';
+        } else {
+          badgeOneDay.textContent = 'Upcoming / শীঘ্রই আসছে';
+          badgeOneDay.style.background = '#fef3c7';
+          badgeOneDay.style.color = '#b45309';
+          badgeOneDay.style.borderColor = '#fde68a';
+          noticeOneDay.textContent = '⏳ Registration Closed (শীঘ্রই শুরু হবে) →';
+          noticeOneDay.style.color = '#b45309';
+        }
+      }
+
+      // 3. Zonal
+      const badgeZonal = document.getElementById('badgeZonal');
+      const noticeZonal = document.getElementById('noticeZonal');
+      if (badgeZonal && noticeZonal) {
+        if (liveControls.zonal) {
+          badgeZonal.textContent = 'REGISTRATION OPEN';
+          badgeZonal.style.background = '#dcfce7';
+          badgeZonal.style.color = '#15803d';
+          badgeZonal.style.borderColor = '#86efac';
+          noticeZonal.textContent = '✍ Click to Fill Form (আবেদন পত্র পূরণ করুন) →';
+          noticeZonal.style.color = '#15803d';
+        } else {
+          badgeZonal.textContent = 'Upcoming / শীঘ্রই আসছে';
+          badgeZonal.style.background = '#fee2e2';
+          badgeZonal.style.color = '#b91c1c';
+          badgeZonal.style.borderColor = '#fca5a5';
+          noticeZonal.textContent = '⏳ Registration Closed (শীঘ্রই শুরু হবে) →';
+          noticeZonal.style.color = '#b91c1c';
+        }
+      }
+
+      // 4. Annual
+      const badgeAnnual = document.getElementById('badgeAnnual');
+      const noticeAnnual = document.getElementById('noticeAnnual');
+      if (badgeAnnual && noticeAnnual) {
+        if (liveControls.annual) {
+          badgeAnnual.textContent = 'REGISTRATION OPEN';
+          badgeAnnual.style.background = '#dcfce7';
+          badgeAnnual.style.color = '#15803d';
+          badgeAnnual.style.borderColor = '#86efac';
+          noticeAnnual.textContent = '✍ Click to Fill Form (আবেদন পত্র পূরণ করুন) →';
+          noticeAnnual.style.color = '#15803d';
+        } else {
+          badgeAnnual.textContent = 'Upcoming / শীঘ্রই আসছে';
+          badgeAnnual.style.background = '#e0e7ff';
+          badgeAnnual.style.color = '#3730a3';
+          badgeAnnual.style.borderColor = '#c7d2fe';
+          noticeAnnual.textContent = '⏳ Registration Closed (শীঘ্রই শুরু হবে) →';
+          noticeAnnual.style.color = '#3730a3';
+        }
+      }
+    }
+
+    function handleCampClick(campKey) {
+      if (campKey === 'halfDay') {
+        if (liveControls.halfDay) openHalfDayForm();
+        else showInactiveNotice('Half Day Camp');
+      } else if (campKey === 'oneDay') {
+        if (liveControls.oneDay) openOneDayForm();
+        else showInactiveNotice('One Day Camp');
+      } else if (campKey === 'zonal') {
+        if (liveControls.zonal) openZonalForm();
+        else showInactiveNotice('Zonal Camp');
+      } else if (campKey === 'annual') {
+        if (liveControls.annual) openAnnualForm();
+        else showInactiveNotice('Annual Camp');
+      }
+    }
+  </script>
+</body>
+</html>
